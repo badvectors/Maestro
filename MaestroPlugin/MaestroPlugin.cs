@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Maestro.Common;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -11,13 +12,13 @@ using System.Windows.Forms;
 using vatsys;
 using vatsys.Plugin;
 
-namespace MaestroPlugin
+namespace Maestro.Plugin
 {
     [Export(typeof(IPlugin))]
     public class MaestroPlugin : IPlugin
     {
         public string Name => nameof(MaestroPlugin);
-        private static BindingList<MaestroAircraft> Aircraft { get; set; } = new BindingList<MaestroAircraft>();
+        private static BindingList<Aircraft> Aircraft { get; set; } = new BindingList<Aircraft>();
         private static System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
         private static HttpClient Client { get; set; } = new HttpClient();
         private static string Url => "https://localhost:7258/Updates";
@@ -66,7 +67,7 @@ namespace MaestroPlugin
             }
             else
             {
-                var aircraft = new MaestroAircraft(updated);
+                var aircraft = new Aircraft(updated);
 
                 Aircraft.Add(aircraft);
 
@@ -74,15 +75,15 @@ namespace MaestroPlugin
             }
         }
 
-        private static async Task Send(MaestroAircraft maestroAircraft)
+        private static async Task Send(Aircraft aircraft)
         {
             try
             {
-                var json = JsonConvert.SerializeObject(maestroAircraft);
+                var json = JsonConvert.SerializeObject(aircraft);
 
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Log.This(json, maestroAircraft.Callsign);
+                Log.This(json, aircraft.Callsign);
 
                 await Client.PostAsync(Url, httpContent);
             }
@@ -102,23 +103,28 @@ namespace MaestroPlugin
 
                 if (target == null) continue;
 
+                var remove = false;
+
                 if (FDP2.GetFDRIndex(aircraft.Callsign) == -1)
                 {
-                    Aircraft.Remove(target);
-                    continue;
+                    remove = true;
                 }
 
                 if (aircraft.GroundSpeed <= 30)
                 {
-                    Aircraft.Remove(target);
-                    continue;
+                    remove = true;
                 }
 
                 if (DateTime.UtcNow.Subtract(aircraft.LastSeen) > TimeSpan.FromMinutes(1))
                 {
-                    Aircraft.Remove(target);
-                    continue;
+                    remove = true;
                 }
+
+                if (!remove) continue;
+
+                Log.Delete(target.Callsign);
+
+                Aircraft.Remove(target);
             }
         }
     }

@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using vatsys;
 using static vatsys.FDP2.FDR;
 
-namespace MaestroPlugin
+namespace Maestro.Common
 {
-    public class MaestroAircraft
+    public class Aircraft
     {
-        public MaestroAircraft() 
+        public Aircraft() 
         {
             LastSeen = DateTime.UtcNow;
         }
 
-        public MaestroAircraft(FDP2.FDR fdr) : this()
+        public Aircraft(FDP2.FDR fdr) : this()
         {
             Callsign = fdr.Callsign;
             Type = fdr.AircraftTypeAndWake?.Type;

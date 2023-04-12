@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace MaestroPlugin
+namespace Maestro.Plugin
 {
     internal class Log
     {
@@ -39,6 +39,13 @@ namespace MaestroPlugin
                 }
             }
             catch { }
+        }
+
+        public static void Delete(string callsign)
+        {
+            var logFile = Path.Combine(LogPath, $"{callsign}.json");
+            
+            if (File.Exists(logFile)) File.Delete(logFile);
         }
     }
 }

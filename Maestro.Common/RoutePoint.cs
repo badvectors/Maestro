@@ -1,6 +1,6 @@
 ﻿using static vatsys.FDP2.FDR.ExtractedRoute;
 
-namespace MaestroPlugin
+namespace Maestro.Common
 {
     public class RoutePoint
     {
