@@ -2,8 +2,10 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -20,11 +22,13 @@ namespace MaestroPlugin
         private static BindingList<MaestroAircraft> Aircraft { get; set; } = new BindingList<MaestroAircraft>();
         private static System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
         private static HttpClient Client { get; set; } = new HttpClient();
-
-        private static string Url { get; set; } = "https://localhost:7258/Updates";
+        private static string Url => "https://localhost:7258/Updates";
+        private static string LogPath => $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Logs\";
 
         public MaestroPlugin()
         {
+            LogStart();
+
             Timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             Timer.Interval = 3000;
             Timer.Enabled = false;
@@ -73,6 +77,39 @@ namespace MaestroPlugin
             }
         }
 
+        private static void LogStart()
+        {
+            try
+            {
+                if (Directory.Exists(LogPath)) Directory.Delete(LogPath, true);
+
+                Directory.CreateDirectory(LogPath);
+            }
+            catch { }
+        }
+
+        private static void LogThis(string message, string callsign = null)
+        {
+            try
+            {
+                string logFile = string.Empty;
+
+                if (callsign == null)
+                    logFile = Path.Combine(LogPath, "Messages.txt");
+                else
+                    logFile = Path.Combine(LogPath, $"{callsign}.json");
+
+                if (!File.Exists(logFile)) File.Create(logFile);
+
+                using (var file = new StreamWriter(logFile, callsign == null))
+                {
+                    if (callsign == null) message = $"{DateTime.UtcNow}:{message}";
+                    file.WriteLine(message);
+                }
+            }
+            catch { }
+        }
+
         private static async Task Send(MaestroAircraft maestroAircraft)
         {
             try
@@ -81,9 +118,16 @@ namespace MaestroPlugin
 
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
+                LogThis(json, maestroAircraft.Callsign);
+
                 await Client.PostAsync(Url, httpContent);
             }
-            catch {  }
+            catch (Exception ex)
+            {
+                LogThis(ex.Message);
+
+                if (ex.InnerException != null) LogThis(ex.InnerException.Message);
+            }
         }
 
         private static void Remove()

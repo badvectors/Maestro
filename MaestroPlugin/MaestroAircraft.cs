@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using vatsys;
 using static vatsys.FDP2.FDR;
 
@@ -22,8 +22,7 @@ namespace MaestroPlugin
             Airport = fdr.DesAirport;
             Runway = fdr.ArrivalRunway?.Runway?.Name ?? null;
             STAR = fdr.STAR?.Name ?? null;
-            if (fdr.Trajectory.Any()) ETO1 = fdr.Trajectory.Last()?.ETO ?? null;
-            if (fdr.ParsedRoute != null) ParsedRoute = fdr.ParsedRoute;
+            if (fdr.ParsedRoute != null) RouteUpdate(fdr.ParsedRoute);
         }
 
         public void FDRUpdate(FDP2.FDR fdr)
@@ -34,15 +33,14 @@ namespace MaestroPlugin
             Airport = fdr.DesAirport;
             Runway = fdr.ArrivalRunway?.Runway?.Name ?? null;
             STAR = fdr.STAR?.Name ?? null;
-            if (fdr.Trajectory.Any()) ETO1 = fdr.Trajectory.Last()?.ETO ?? null;
-            if (fdr.ParsedRoute != null) ParsedRoute = fdr.ParsedRoute;
+            if (fdr.ParsedRoute != null) RouteUpdate(fdr.ParsedRoute);
         }
 
         public void RadarUpdate(RDP.RadarTrack radarTrack)
         {
             LastSeen = DateTime.UtcNow;
 
-            GroundSpeed = radarTrack.GroundSpeed;
+            GroundSpeed = Convert.ToInt32(Math.Round(radarTrack.GroundSpeed, 0));
 
             if (ParsedRoute == null) return;
 
@@ -55,13 +53,19 @@ namespace MaestroPlugin
                 lastPos = wpt.Intersection.LatLong;
             }
 
-            DistanceToGo = distanceToGo;
+            DistanceToGo = Math.Round(distanceToGo, 2);
+        }
 
-            if (GroundSpeed == 0) return;
+        private void RouteUpdate(ExtractedRoute parsedRoute)
+        {
+            ParsedRoute = parsedRoute;
 
-            HoursToGo = DistanceToGo / GroundSpeed;
+            Route.Clear();
 
-            ETO2 = DateTime.UtcNow.AddHours(HoursToGo.Value);
+            foreach (var wpt in ParsedRoute.Where(x => x.ETO > DateTime.UtcNow))
+            {
+                Route.Add(new RoutePoint(wpt));
+            }
         }
 
         public string Callsign { get; set; }
@@ -71,12 +75,11 @@ namespace MaestroPlugin
         public string Airport { get; set; }
         public string Runway { get; set; }
         public string STAR { get; set; }
-        public DateTime? ETO1 { get; set; }
-        public DateTime? ETO2 { get; set; }
-        public double? HoursToGo { get; set; }
-        public double? GroundSpeed { get; set; }
+        public int? GroundSpeed { get; set; }
         public double? DistanceToGo { get; set; }
+        public List<RoutePoint> Route { get; set; } = new List<RoutePoint>();
         public DateTime LastSeen { get; set; }
+
         [JsonIgnore] public ExtractedRoute ParsedRoute { get; set; }
 
     }
