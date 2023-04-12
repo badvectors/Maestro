@@ -23,11 +23,10 @@ namespace MaestroPlugin
         private static System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
         private static HttpClient Client { get; set; } = new HttpClient();
         private static string Url => "https://localhost:7258/Updates";
-        private static string LogPath => $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\Logs\";
 
         public MaestroPlugin()
         {
-            LogStart();
+            Log.Start();
 
             Timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             Timer.Interval = 3000;
@@ -75,39 +74,6 @@ namespace MaestroPlugin
 
                 await Send(aircraft);
             }
-        }
-
-        private static void LogStart()
-        {
-            try
-            {
-                if (Directory.Exists(LogPath)) Directory.Delete(LogPath, true);
-
-                Directory.CreateDirectory(LogPath);
-            }
-            catch { }
-        }
-
-        private static void LogThis(string message, string callsign = null)
-        {
-            try
-            {
-                string logFile = string.Empty;
-
-                if (callsign == null)
-                    logFile = Path.Combine(LogPath, "Messages.txt");
-                else
-                    logFile = Path.Combine(LogPath, $"{callsign}.json");
-
-                if (!File.Exists(logFile)) File.Create(logFile);
-
-                using (var file = new StreamWriter(logFile, callsign == null))
-                {
-                    if (callsign == null) message = $"{DateTime.UtcNow}:{message}";
-                    file.WriteLine(message);
-                }
-            }
-            catch { }
         }
 
         private static async Task Send(MaestroAircraft maestroAircraft)
