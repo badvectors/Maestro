@@ -2,10 +2,8 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -84,15 +82,15 @@ namespace MaestroPlugin
 
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-                LogThis(json, maestroAircraft.Callsign);
+                Log.This(json, maestroAircraft.Callsign);
 
                 await Client.PostAsync(Url, httpContent);
             }
             catch (Exception ex)
             {
-                LogThis(ex.Message);
+                Log.This(ex.Message);
 
-                if (ex.InnerException != null) LogThis(ex.InnerException.Message);
+                if (ex.InnerException != null) Log.This(ex.InnerException.Message);
             }
         }
 
