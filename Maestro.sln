@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maestro.Plugin", "MaestroPlugin\Maestro.Plugin.csproj", "{0DDF31C8-723A-49C3-9583-59890DE4C596}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maestro.Plugin", "Maestro.Plugin\Maestro.Plugin.csproj", "{0DDF31C8-723A-49C3-9583-59890DE4C596}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maestro.Common", "Maestro.Common\Maestro.Common.csproj", "{FF538A31-E597-4CD2-9405-53E6DFF697F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maestro.Common", "Maestro.Common\Maestro.Common.csproj", "{FF538A31-E597-4CD2-9405-53E6DFF697F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maestro.Web", "Maestro.Web\Maestro.Web.csproj", "{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,18 @@ Global
 		{FF538A31-E597-4CD2-9405-53E6DFF697F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FF538A31-E597-4CD2-9405-53E6DFF697F3}.Release|x86.ActiveCfg = Release|Any CPU
 		{FF538A31-E597-4CD2-9405-53E6DFF697F3}.Release|x86.Build.0 = Release|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.DebugWithVatsys|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.DebugWithVatsys|Any CPU.Build.0 = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.DebugWithVatsys|x86.ActiveCfg = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.DebugWithVatsys|x86.Build.0 = Debug|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B4BFE8D-9B03-4CAC-9E96-24710EE540FA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

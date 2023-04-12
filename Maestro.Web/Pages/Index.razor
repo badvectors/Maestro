@@ -1,0 +1,122 @@
+﻿@page "/"
+@using static Maestro.Web.Airspace;
+
+<PageTitle>MAESTRO</PageTitle>
+
+@foreach (var airport in Airports)
+{
+    <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
+        <div class="form-control">@airport.FullName</div>
+        <button @onclick="() => Remove(airport.ICAOName)" class="btn btn-outline-secondary" type="button">
+            <i class="fa-solid fa-xmark fa-fw"></i>
+        </button>
+    </div>
+
+    <div class="row">
+        @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
+        {
+            var aircraft = Functions.Aircraft.Where(x => x.Airport == airport.ICAOName && x.Runway == runway.Name);
+
+            @if (aircraft.Any(x => x.GroundSpeed > 30))
+            {
+                <div class="col-md">
+
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr class="bg-dark text-light"><th>@airport.ICAOName @runway.Name</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ac in aircraft.Where(x => x.GroundSpeed > 30 && x.GetOK()).OrderBy(x => x.GetETO()))
+                            {
+                                <tr>
+                                    <td>
+                                        <h5 class="float-end" style="margin-top:13px;">
+                                            @ac.GetETO()
+                                        </h5>
+                                        <b>@ac.Callsign</b>  <br />
+                                        <small class="text-muted">
+                                            @ac.Wake/@ac.FlightRules/@ac.GetSpeed()/@ac.GetDTG()/@ac.STAR
+                                        </small>
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var ac in aircraft.Where(x => x.GroundSpeed > 30 && !x.GetOK()).OrderBy(x => x.Callsign))
+                            {
+                                <tr>
+                                    <td>
+                                        <b>@ac.Callsign</b> <br />
+                                        <small class="text-muted">
+                                            @ac.Wake/@ac.FlightRules/@ac.GetSpeed()/@ac.GetDTG()/@ac.STAR
+                                        </small>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+}
+
+@if (!Airports.Any())
+{
+    <div class="input-group mt-3">
+        <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
+        <input @bind="ICAO" @oninput="(e)=> ICAO = e.Value.ToString()" @onkeydown="Enter" type="text" class="form-control" placeholder="ICAO code">
+        <button @onclick="Add" class="btn btn-outline-secondary" type="button">
+            <i class="fa-solid fa-check fa-fw"></i>
+        </button>
+    </div>
+}
+
+@code {
+    private List<Airport> Airports { get; set; } = new List<Airport>();
+    private string ICAO { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Functions.LoadData();
+
+        Functions.AircraftUpdated += Update;
+    }
+
+    private void Update(object sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code != "Enter" && e.Code != "NumpadEnter") return;
+
+        Add();
+    }
+
+    private void Add()
+    {
+        var airport = Airspace.GetAirport(ICAO.Trim().ToUpper());
+
+        if (airport == null)
+        {
+            return;
+        }
+
+        if (!Airports.Any(x => x.ICAOName == airport.ICAOName))
+        {
+            Airports.Add(airport);
+        }
+
+        ICAO = string.Empty;
+    }
+
+    private void Remove(string icao)
+    {
+        var airport = Airports.FirstOrDefault(x => x.ICAOName == icao);
+
+        if (airport == null) return;
+
+        Airports.Remove(airport);
+    }
+}

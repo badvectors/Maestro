@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>vatSysServer.Models</name>
+    </assembly>
+    <members>
+        <member name="M:vatSysServer.Models.BoundingBox.ContainsPoint(vatSysServer.Models.Coordinate)">
+            <summary>
+            Inexpensive bounding box check
+            </summary>
+            <param name="point">Coordinate to test</param>
+            <returns>True if point is inside the min/max latitude and longitude</returns>
+        </member>
+        <member name="M:vatSysServer.Models.BoundingBox.Intersects(vatSysServer.Models.BoundingBox)">
+            <summary>
+            Inexpensive bounding box collision check
+            </summary>
+            <param name="test">bounding box to test against</param>
+            <returns>true if boxes intersect</returns>
+        </member>
+        <member name="M:vatSysServer.Models.BoundingBox.GetCentre">
+            <summary>
+            Bounding box centre
+            </summary>
+        </member>
+        <member name="M:vatSysServer.Models.Conversions.CalculateTAS(System.Double,System.Boolean,System.Double,System.Double)">
+            <summary>
+            Calculate True Airspeed
+            </summary>
+            <param name="speed">Mach as decimal or Calibrated Airspeed in Knots</param>
+            <param name="isMach">speed is a Mach</param>
+            <param name="temperature">Outside air temperature in Celsius</param>
+            <param name="pressureAltitude">Pressure Altitude in Feet</param>
+            <returns>TAS in Knots</returns>
+        </member>
+        <member name="M:vatSysServer.Models.Conversions.CalculateMach(System.Double,System.Double)">
+            <summary>
+            Calculate Mach
+            </summary>
+            <param name="tas">in Knots</param>
+            <param name="temperature">in Celsius</param>
+            <returns></returns>
+        </member>
+        <member name="M:vatSysServer.Models.Conversions.CalculateCAS(System.Double,System.Double,System.Double)">
+            <summary>
+            Calibrated Airspeed
+            </summary>
+            <param name="tas">in Knots</param>
+            <param name="pressureAltitude">in Feet</param>
+            <param name="temperature">in Celsius</param>
+            <returns>Calibrated Airspeed in Knots</returns>
+        </member>
+        <member name="M:vatSysServer.Models.DtoPackager.Pack(System.Byte[])">
+            <summary>
+            Serializes IMessagePackDtos and packs with Dto length ready for sending
+            </summary>
+            <param name="dto"></param>
+            <returns>byte array ready to be sent</returns>
+        </member>
+        <member name="M:vatSysServer.Models.DtoPackager.TryUnpack(System.Byte[],System.Int64,System.Int64)">
+            <summary>
+            Buffers received data and returns complete serialized DTO's ready for deserialization  
+            </summary>
+            <param name="buffer">Buffered data to append and process</param>
+            <param name="offset">Buffer offset</param>
+            <param name="size">Buffer size</param>
+            <returns>null if no complete dtos found</returns>
+        </member>
+        <member name="M:vatSysServer.Models.DtoPackager.ResetBuffers">
+            <summary>
+            Resets buffers for re-use 
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.Id">
+            <summary>
+            Unique request Id
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.Type">
+            <summary>
+            Request Type
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.FDRId">
+            <summary>
+            Unique Id of one or more FDRs referenced in this request.
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.RadTagId">
+            <summary>
+            Unique Id of RadTag referenced in this request.
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.CurrentHash">
+            <summary>
+            The HashCode of the FDR/RadTag to be modified
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDPRequestDto.Parameters">
+            <summary>
+            Property (string name) values (object) to update
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDRAlertsDto.Id">
+            <summary>
+            FDR Id
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.FDRAlertsDto.Alerts">
+            <summary>
+            Current Alerts
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RadarTrackAlertsDto.Id">
+            <summary>
+            RadarTrack Id
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RadarTrackAlertsDto.Alerts">
+            <summary>
+            Current Alerts
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RDPRequestDto.Id">
+            <summary>
+            Unique Request Id
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RDPRequestDto.Type">
+            <summary>
+            Request Type
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RDPRequestDto.RadTagId">
+            <summary>
+            Rad Tag Id.
+            For Edit or Delete RadTag, this is the Id of the chosen tag.
+            </summary>
+        </member>
+        <member name="P:vatSysServer.Models.RDPRequestDto.ModifiedRadTagParameter">
+            <summary>
+            Rad Tag Paramenter.
+            For Create or Edit RadTag, this is the requested changes.
+            </summary>
+        </member>
+    </members>
+</doc>
