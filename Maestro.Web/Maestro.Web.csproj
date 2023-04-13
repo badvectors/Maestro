@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Maestro.Common\Maestro.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="gribcs">
       <HintPath>References\gribcs.dll</HintPath>
     </Reference>

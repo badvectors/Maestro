@@ -1,3 +1,4 @@
+using Maestro.Common;
 using Maestro.Web;
 using Maestro.Web.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@ namespace Maestro.Web.Pages
 
         }
 
-        public void OnPost([FromBody] MaestroAircraft maestroAircraft)
+        public void OnPost([FromBody] Aircraft aircraft)
         {
-            Functions.Update(maestroAircraft);
+            Functions.Update(aircraft);
         }
     }
 }

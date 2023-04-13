@@ -3,7 +3,26 @@
 
 <PageTitle>MAESTRO</PageTitle>
 
-@foreach (var airport in Airports)
+<table class="table table-bordered">
+    @foreach (var aircraft in Functions.Aircraft.OrderBy(x => x.Airport).ThenBy(x => x.Runway))
+    {
+        var aircraftData = Functions.AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
+
+        <tr>
+            <td>@aircraft.Callsign</td>
+            <td>@aircraft.Type / @aircraft.Wake / @aircraft.FlightRules</td>
+            <td>@aircraft.Airport</td>
+            <td>@aircraft.Runway</td>
+            <td>@aircraft.STAR</td>
+            <td>@aircraftData.DistanceToGo</td>
+            <td>
+                @Math.Round(DateTime.UtcNow.Subtract(aircraft.UpdateUTC).TotalSeconds, 0)</td>
+        </tr>
+    }
+
+</table>
+
+@*@foreach (var airport in Airports)
 {
     <div class="input-group">
         <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
@@ -27,27 +46,13 @@
                             <tr class="bg-dark text-light"><th>@airport.ICAOName @runway.Name</th></tr>
                         </thead>
                         <tbody>
-                            @foreach (var ac in aircraft.Where(x => x.GroundSpeed > 30 && x.GetOK()).OrderBy(x => x.GetETO()))
+                            @foreach (var ac in aircraft)
                             {
                                 <tr>
                                     <td>
-                                        <h5 class="float-end" style="margin-top:13px;">
-                                            @ac.GetETO()
-                                        </h5>
                                         <b>@ac.Callsign</b>  <br />
                                         <small class="text-muted">
-                                            @ac.Wake/@ac.FlightRules/@ac.GetSpeed()/@ac.GetDTG()/@ac.STAR
-                                        </small>
-                                    </td>
-                                </tr>
-                            }
-                            @foreach (var ac in aircraft.Where(x => x.GroundSpeed > 30 && !x.GetOK()).OrderBy(x => x.Callsign))
-                            {
-                                <tr>
-                                    <td>
-                                        <b>@ac.Callsign</b> <br />
-                                        <small class="text-muted">
-                                            @ac.Wake/@ac.FlightRules/@ac.GetSpeed()/@ac.GetDTG()/@ac.STAR
+                                            @ac.Wake/@ac.FlightRules/@ac.STAR
                                         </small>
                                     </td>
                                 </tr>
@@ -69,7 +74,7 @@
             <i class="fa-solid fa-check fa-fw"></i>
         </button>
     </div>
-}
+}*@
 
 @code {
     private List<Airport> Airports { get; set; } = new List<Airport>();

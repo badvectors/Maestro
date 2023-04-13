@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="vatSys">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\vatSys\bin\vatSys.exe</HintPath>
+    <Reference Include="vatSysServer.Models">
+      <HintPath>..\Maestro.Web\References\vatSysServer.Models.dll</HintPath>
     </Reference>
   </ItemGroup>
 

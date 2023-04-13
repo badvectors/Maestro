@@ -27,7 +27,7 @@ namespace Maestro.Web.Data
         {
             foreach (var aircraft in Functions.Aircraft.ToList())
             {
-                if (DateTime.UtcNow.Subtract(aircraft.LastSeen) > TimeSpan.FromMinutes(1))
+                if (DateTime.UtcNow.Subtract(aircraft.UpdateUTC) > TimeSpan.FromMinutes(5))
                 {
                     Functions.Remove(aircraft);
                     continue;

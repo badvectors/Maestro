@@ -2,9 +2,9 @@
 using System.Xml;
 using System.Net.Http;
 using System.Collections.Generic;
-using Maestro.Web.Data;
 using System.Linq;
 using System;
+using Maestro.Common;
 
 namespace Maestro.Web
 {
@@ -12,23 +12,39 @@ namespace Maestro.Web
     {
         private readonly static HttpClient Client = new();
 
-        public static List<MaestroAircraft> Aircraft = new();
+        public static List<Aircraft> Aircraft = new();
+        public static List<AircraftData> AircraftData = new();
 
         public static event EventHandler AircraftUpdated;
 
-        public static void Update(MaestroAircraft maestroAircraft)
+        public static void Update(Aircraft aircraft)
         {
             try
             {
-                var existing = Aircraft.FirstOrDefault(x => x.Callsign == maestroAircraft.Callsign);
+                var existing = Aircraft.FirstOrDefault(x => x.Callsign == aircraft.Callsign && x.SweatBox == aircraft.SweatBox);
 
                 if (existing != null)
                 {
-                    existing.Update(maestroAircraft);
+                    existing.Type = aircraft.Type;
+                    existing.FlightRules = aircraft.FlightRules;
+                    existing.Wake = aircraft.Wake;
+                    existing.Airport = aircraft.Airport;
+                    existing.Runway = aircraft.Runway;
+                    existing.STAR = aircraft.STAR;
+                    existing.Position = aircraft.Position;
+                    existing.GroundSpeed = aircraft.GroundSpeed;
+                    existing.Route = aircraft.Route;
+                    existing.UpdateUTC = aircraft.UpdateUTC;
+
+                    var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
+
+                    if (aircraftData != null) aircraftData.Update(aircraft);
                 }
                 else
                 {
-                    Aircraft.Add(maestroAircraft);
+                    Aircraft.Add(aircraft);
+
+                    AircraftData.Add(new AircraftData(aircraft));
                 }
 
                 AircraftUpdated?.Invoke(null, new EventArgs());
@@ -36,9 +52,13 @@ namespace Maestro.Web
             catch { }
         }
 
-        public static void Remove(MaestroAircraft maestroAircraft)
+        public static void Remove(Aircraft aircraft)
         {
-            Aircraft.Remove(maestroAircraft);
+            Aircraft.Remove(aircraft);
+
+            var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
+
+            if (aircraftData != null) AircraftData.Remove(aircraftData);
 
             AircraftUpdated?.Invoke(null, new EventArgs());
         }

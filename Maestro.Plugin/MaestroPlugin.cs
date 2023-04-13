@@ -22,6 +22,7 @@ namespace Maestro.Plugin
         private static System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
         private static HttpClient Client { get; set; } = new HttpClient();
         private static string Url => "https://localhost:7258/Updates";
+        private static bool SweatBox { get; set; }
 
         public MaestroPlugin()
         {
@@ -30,6 +31,14 @@ namespace Maestro.Plugin
             Timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             Timer.Interval = 3000;
             Timer.Enabled = false;
+
+            Network.Connected += Network_Connected;
+        }
+
+        private void Network_Connected(object sender, EventArgs e)
+        {
+            if (Network.IsOfficialServer) SweatBox = false;
+            else SweatBox = true;
         }
 
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -50,7 +59,7 @@ namespace Maestro.Plugin
 
             if (existing == null) return;
 
-            existing.RadarUpdate(updated);
+            existing = Functions.RadarUpdate(existing, updated);
 
             await Send(existing);
         }
@@ -61,13 +70,13 @@ namespace Maestro.Plugin
 
             if (existing != null)
             {
-                existing.FDRUpdate(updated);
+                existing = Functions.FDRUpdate(existing, updated);
 
                 await Send(existing);
             }
             else
             {
-                var aircraft = new Aircraft(updated);
+                var aircraft = Functions.Create(updated, SweatBox);
 
                 Aircraft.Add(aircraft);
 
@@ -115,7 +124,7 @@ namespace Maestro.Plugin
                     remove = true;
                 }
 
-                if (DateTime.UtcNow.Subtract(aircraft.LastSeen) > TimeSpan.FromMinutes(1))
+                if (DateTime.UtcNow.Subtract(aircraft.UpdateUTC) > TimeSpan.FromMinutes(1))
                 {
                     remove = true;
                 }

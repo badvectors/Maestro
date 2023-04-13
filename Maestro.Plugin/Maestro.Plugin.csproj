@@ -96,6 +96,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="MaestroPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
