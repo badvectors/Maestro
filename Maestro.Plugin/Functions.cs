@@ -55,6 +55,8 @@ namespace Maestro.Plugin
                 Longitude = radarTrack.LatLong.Longitude
             };
 
+            aircraft.Altitude = radarTrack.ActualAircraft.PressureAltitude;
+
             return aircraft;
         }
 

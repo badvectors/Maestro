@@ -40,6 +40,7 @@ namespace Maestro.Common
                 return DateTime.UtcNow.AddHours(TotalHours.Value);
             }
         }
+        public TrendDirection Trend { get; set; }
 
         public void Update(Aircraft aircraft)
         {
@@ -92,10 +93,10 @@ namespace Maestro.Common
 
             var performance = Performance.GetPerformanceData(atw);
 
-            var pdLevel = performance.GetNearestDataToLevel(5000);
-
             if (!feederRoutePoint.Passed)
             {
+                var pdLevel = performance.GetNearestDataToLevel(5000);
+
                 double distanceToFeeder = 0;
 
                 var lastPos = new Coordinate(aircraft.Position.Latitude, aircraft.Position.Longitude);
@@ -139,6 +140,8 @@ namespace Maestro.Common
             }
             else
             {
+                var pdLevel = performance.GetNearestDataToLevel(aircraft.Altitude ?? 5000);
+
                 DistanceToFeeder = 0;
                 HoursToFeeder = 0;
 
@@ -158,6 +161,14 @@ namespace Maestro.Common
                 DistanceFromFeeder = Math.Round(distanceToGo, 2);
                 HoursFromFeeder = DistanceFromFeeder / pdLevel.DescentSpeed.Speed;
             }
+        }
+
+        public enum TrendDirection
+        {
+            None,
+            Stable,
+            Slower,
+            Faster
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Maestro.Common
         public string Runway { get; set; }
         public string STAR { get; set; }
         public Position Position { get; set; }
+        public int? Altitude { get; set; }
         public int? GroundSpeed { get; set; }
         public string Route { get; set; }
         public List<RoutePoint> RoutePoints { get; set; } = new List<RoutePoint>();
