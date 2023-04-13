@@ -4,19 +4,55 @@
 <PageTitle>MAESTRO</PageTitle>
 
 <table class="table table-bordered">
-    @foreach (var aircraft in Functions.Aircraft.OrderBy(x => x.Airport).ThenBy(x => x.Runway))
+    <tr>
+        <th>Callsign</th>
+        <th>Details</th>
+        <th>Destination</th>
+        <th>Feeder</th>
+        <th>To Feeder</th>
+        <th>To Runway</th>
+        <th>Total</th>
+        <th>ETA</th>
+    </tr>
+
+    @foreach (var aircraft in Functions.Aircraft.Where(x => x.Airport == "YMML").OrderBy(x => x.Airport).ThenBy(x => x.Runway))
     {
         var aircraftData = Functions.AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
 
         <tr>
             <td>@aircraft.Callsign</td>
             <td>@aircraft.Type / @aircraft.Wake / @aircraft.FlightRules</td>
-            <td>@aircraft.Airport</td>
-            <td>@aircraft.Runway</td>
-            <td>@aircraft.STAR</td>
-            <td>@aircraftData.DistanceToGo</td>
+            <td>@aircraft.Airport / @aircraft.Runway / @aircraft.STAR</td>
+            <td>@aircraftData?.FeederFix</td>
+            <td> @aircraftData?.DistanceToFeeder /
+                @if (aircraftData?.HoursToFeeder != null)
+                {
+                    @Math.Round(TimeSpan.FromHours(aircraftData.HoursToFeeder.Value).TotalMinutes, 2)
+                }
+            </td>
             <td>
-                @Math.Round(DateTime.UtcNow.Subtract(aircraft.UpdateUTC).TotalSeconds, 0)</td>
+                @aircraftData?.DistanceFromFeeder /
+                @if (aircraftData?.HoursFromFeeder != null)
+                {
+                    @Math.Round(TimeSpan.FromHours(aircraftData.HoursFromFeeder.Value).TotalMinutes, 2)
+                }
+            </td>
+            <td>
+                @if (aircraftData?.TotalDistance != null)
+                {
+                    @Math.Round(aircraftData.TotalDistance.Value, 2)
+                } /
+                @if (aircraftData?.TotalHours != null)
+                {
+                    @Math.Round(TimeSpan.FromHours(aircraftData.TotalHours.Value).TotalMinutes, 2)
+                }
+            </td>
+            <td>
+                @if (aircraftData?.ETA != null)
+                {
+                    @aircraftData.ETA.Value.ToString("HHmm")   
+                }
+            </td>
         </tr>
     }
 

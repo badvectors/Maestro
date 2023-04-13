@@ -5,6 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Maestro.Common;
+using System.IO;
+using System.Xml.Serialization;
+using Maestro.Web.Data;
+using Maestro.Web.Models;
 
 namespace Maestro.Web
 {
@@ -12,8 +16,9 @@ namespace Maestro.Web
     {
         private readonly static HttpClient Client = new();
 
-        public static List<Aircraft> Aircraft = new();
-        public static List<AircraftData> AircraftData = new();
+        public static List<Aircraft> Aircraft { get; set; } = new();
+        public static List<AircraftData> AircraftData { get; set; } = new();
+        public static MaestroData MaestroData { get; set;} = new();
 
         public static event EventHandler AircraftUpdated;
 
@@ -33,12 +38,12 @@ namespace Maestro.Web
                     existing.STAR = aircraft.STAR;
                     existing.Position = aircraft.Position;
                     existing.GroundSpeed = aircraft.GroundSpeed;
-                    existing.Route = aircraft.Route;
+                    existing.RoutePoints = aircraft.RoutePoints;
                     existing.UpdateUTC = aircraft.UpdateUTC;
 
                     var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
 
-                    if (aircraftData != null) aircraftData.Update(aircraft);
+                    aircraftData?.Update(aircraft);
                 }
                 else
                 {
@@ -77,6 +82,29 @@ namespace Maestro.Web
                 Airspace.LoadNavData(xmldocument, false);
             }
             catch { }
+
+            url = "https://raw.githubusercontent.com/vatSys/australia-dataset/master/Performance.xml";
+
+            try
+            {
+                var response = Client.GetAsync(url).Result;
+                if (!response.IsSuccessStatusCode) return;
+                var result = await response.Content.ReadAsStringAsync();
+                var xmldocument = new XmlDocument();
+                xmldocument.LoadXml(result);
+                Performance.LoadPerformance(xmldocument, false);
+            }
+            catch { }
+
+            var path = $@"{AppContext.BaseDirectory}Data\Maestro.xml";
+
+            if (File.Exists(path))
+            {
+                string readText = File.ReadAllText(path);
+                var serializer = new XmlSerializer(typeof(MaestroData));
+                using var reader = new StringReader(readText);
+                MaestroData = (MaestroData)serializer.Deserialize(reader);
+            }
         }
     }
 }

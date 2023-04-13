@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<MaestroData>
+  <Airport ICAO="YMML">
+    <!-- Runway Name, Default Rate in seconds - Order determines order shown in footer -->
+    <Runways>
+      <Runway Name="16" />
+      <Runway Name="27" />
+      <Runway Name="34" />
+      <Runway Name="09" />
+    </Runways>
+    <!-- Mode Name, Runway:Arrival Rate in seconds -->
+    <RunwayModes>
+      <Mode Name="16I" RunwayRate="16:180" Dependencies="" />
+      <Mode Name="27I" RunwayRate="27:210" Dependencies="" />
+      <Mode Name="34I" RunwayRate="34:180" Dependencies="" />
+      <Mode Name="09I" RunwayRate="09:210" Dependencies="" />
+      <Mode Name="3427" RunwayRate="34:180,27:210" Dependencies="34:27:60" />
+      <Mode Name="LAHSO" RunwayRate="34:180,27:210" Dependencies="" />
+    </RunwayModes>
+    <!-- Sector Name, comma delimited Fix Names - 'Fixes' order determines order shown in footer -->
+    <Sectors>
+      <Sector Name="ELW" Fixes="BOYSE,LIZZI,BADGR" />
+      <Sector Name="YWE" Fixes="ARBEY,WENDY" />
+      <Sector Name="WON" Fixes="WAREN,PORTS" />
+      <Sector Name="ALL" Fixes="BOYSE,LIZZI,BADGR,WAREN,PORTS,ARBEY,WENDY" />
+    </Sectors>
+    <!-- Fix Name, Star Type (A, V, X, etc), preferred runway(s) if applicable, runway:distance in NM from FF to RWY -->
+    <FixRunwayRules>
+      <Fix Name="LIZZI" StarName="LIZI" Airway="Q29" Type="A" PreferredRunway="" DistanceToRunway="16:52,27:41,34:54,09:67"/>
+      <Fix Name="LIZZI" StarName="LIZI" Airway="Q29" Type="V" PreferredRunway="34" DistanceToRunway="34:44"/>
+      <Fix Name="ARBEY" StarName="ARBE" Airway="H119" Type="A" PreferredRunway="" DistanceToRunway="16:30,27:49,34:55,09:41"/>
+      <Fix Name="BOYSE" StarName="BOYS" Airway="V169" Type="A" PreferredRunway="" DistanceToRunway="16:54,27:47,34:61,09:74"/>
+      <Fix Name="BOYSE" StarName="BOYS" Airway="V169" Type="V" PreferredRunway="" DistanceToRunway="34:51"/>
+      <Fix Name="LATTA" StarName="PORT" Airway="" Type="A" PreferredRunway="" DistanceToRunway="34:21,09:46"/>
+      <Fix Name="WAREN" StarName="WARE" Airway="W687" Type="A" PreferredRunway="" DistanceToRunway="16:57,27:34,34:38,09:57"/>
+      <Fix Name="WAREN" StarName="WARE" Airway="W687" Type="M" PreferredRunway="" DistanceToRunway="16:47"/>
+      <Fix Name="WENDY" StarName="WEND" Airway="V279" Type="A" PreferredRunway="" DistanceToRunway="16:82,27:64,34:52,09:44"/>
+      <Fix Name="WENDY" StarName="WEND" Airway="V279" Type="P" PreferredRunway="" DistanceToRunway="16:69"/>
+    </FixRunwayRules>
+  </Airport>
+  <Airport ICAO="YSSY">
+    <Runways>
+      <Runway Name="16L" />
+      <Runway Name="34L" />
+      <Runway Name="07" />
+      <Runway Name="16R" />
+      <Runway Name="34R" />
+      <Runway Name="25" />
+    </Runways>
+    <RunwayModes>
+      <Mode Name="34IVA" RunwayRate="34L:180,34R:180" Dependencies="" />
+      <Mode Name="34I" RunwayRate="34L:210,34R:210" Dependencies="34L:34R:60,34R:34L:60" />
+      <Mode Name="16IVA" RunwayRate="16R:180,16L:180" Dependencies="" />
+      <Mode Name="16I" RunwayRate="16R:210,16L:210" Dependencies="16L:16R:60,16R:16L:60" />
+      <Mode Name="25I" RunwayRate="25:210" Dependencies="" />
+      <Mode Name="07I" RunwayRate="07:210" Dependencies="" />
+      <Mode Name="SODPROPS" RunwayRate="34L:300" Dependencies="" />
+    </RunwayModes>
+    <Sectors>
+      <Sector Name="BIK" Fixes="RIVET,WELSH" />
+      <Sector Name="ARL" Fixes="BOREE,YAKKA" />
+      <Sector Name="OCN" Fixes="MARLN" />
+      <Sector Name="ALL" Fixes="RIVET,WELSH,BOREE,YAKKA,MARLN" />
+    </Sectors>
+    <FixRunwayRules>
+      <Fix Name="WELSH" StarName="ODALE" Airway="W113" Type="A" PreferredRunway="16R,34L" DistanceToRunway="16R:44,16L:67,34R:67,34L:44,25:54,07:32" />
+      <Fix Name="RIVET" StarName="RIVET" Airway="Y59" Type="A" PreferredRunway="16R,34L" DistanceToRunway="16R:65,16L:76,34R:76,34L:62,25:70,07:42" />
+      <Fix Name="BOREE" StarName="BORE" Airway="H12" Type="A" PreferredRunway="16L,34R" DistanceToRunway="16R:42,16L:43,34R:75,34L:75,25:60,07:71" />
+      <Fix Name="BOREE" StarName="BORE" Airway="H12" Type="P" PreferredRunway="" DistanceToRunway="16R:42" />
+      <Fix Name="YAKKA" StarName="MEPIL" Airway="W180" Type="A" PreferredRunway="16L,34R" DistanceToRunway="16R:45,16L:45,34R:62,34L:85,25:48,07:65" />
+      <Fix Name="MARLN" StarName="MARLN" Airway="N774" Type="A" PreferredRunway="16L,34R" DistanceToRunway="16R:80,16L:60,34R:62,34L:85,25:48,07:70" />
+    </FixRunwayRules>
+  </Airport>
+  <Airport ICAO="YPPH">
+    <Runways>
+      <Runway Name="03" />
+      <Runway Name="21" />
+      <Runway Name="06" />
+      <Runway Name="24" />
+    </Runways>
+    <RunwayModes>
+      <Mode Name="21I" RunwayRate="21:180" Dependencies="" />
+      <Mode Name="24I" RunwayRate="24:210" Dependencies="" />
+      <Mode Name="03I" RunwayRate="03:180" Dependencies="" />
+      <Mode Name="06I" RunwayRate="06:210" Dependencies="" />
+      <Mode Name="2124I" RunwayRate="21:180,24:240" Dependencies="24:21:30" />
+      <Mode Name="0306I" RunwayRate="03:180,06:240" Dependencies="06:03:30" />
+    </RunwayModes>
+    <Sectors>
+      <Sector Name="PIY" Fixes="GRENE,DAYLR,BEVLY,JULIM,CONNI" />
+      <Sector Name="JAR" Fixes="SOLUS" />
+      <Sector Name="LEA" Fixes="WAVES" />
+      <Sector Name="ALL" Fixes="GRENE,DAYLR,BEVLY,JULIM,CONNI,SOLUS,WAVES" />
+    </Sectors>
+    <FixRunwayRules>
+      <Fix Name="BEVLY" StarName="BEVL" Airway="Q158" Type="A" PreferredRunway="03,24" DistanceToRunway="03:64,06:72,21:62,24:57"/>
+      <Fix Name="BEVLY" StarName="BEVL" Airway="Q158" Type="V" PreferredRunway="03" DistanceToRunway="03:55,06:59"/>
+      <Fix Name="BEVLY" StarName="BEVL" Airway="Q158" Type="X" PreferredRunway="" DistanceToRunway="03:53"/>
+      <Fix Name="CONNI" StarName="CONI" Airway="V16" Type="A" PreferredRunway="03,21" DistanceToRunway="03:77,06:85,21:35,24:36"/>
+      <Fix Name="CONNI" StarName="CONI" Airway="V16" Type="V" PreferredRunway="03" DistanceToRunway="03:66,06:51"/>
+      <Fix Name="CONNI" StarName="CONI" Airway="V16" Type="X" PreferredRunway="" DistanceToRunway="03:64"/>
+      <Fix Name="DAYLR" StarName="DAYL" Airway="" Type="A" PreferredRunway="03" DistanceToRunway="03:47,06:55"/>
+      <Fix Name="DAYLR" StarName="DAYL" Airway="" Type="V" PreferredRunway="03" DistanceToRunway="03:40,06:44"/>
+      <Fix Name="DAYLR" StarName="DAYL" Airway="" Type="X" PreferredRunway="" DistanceToRunway="03:38"/>
+      <Fix Name="GRENE" StarName="GREN" Airway="Z38" Type="A" PreferredRunway="03,24" DistanceToRunway="03:70,06:78,21:57,24:52"/>
+      <Fix Name="GRENE" StarName="GREN" Airway="Z38" Type="V" PreferredRunway="03" DistanceToRunway="03:58,06:62"/>
+      <Fix Name="GRENE" StarName="GREN" Airway="Z38" Type="X" PreferredRunway="" DistanceToRunway="03:56"/>
+      <Fix Name="JULIM" StarName="JULI" Airway="Q38" Type="A" PreferredRunway="03,21" DistanceToRunway="03:78,06:84,21:35,24:37"/>
+      <Fix Name="JULIM" StarName="JULI" Airway="Q38" Type="V" PreferredRunway="03" DistanceToRunway="03:66,06:70"/>
+      <Fix Name="JULIM" StarName="JULI" Airway="Q38" Type="X" PreferredRunway="" DistanceToRunway="03:64"/>
+      <Fix Name="SOLUS" StarName="SOLU" Airway="W172" Type="A" PreferredRunway="03,24" DistanceToRunway="03:42,06:50,21:54,24:49"/>
+      <Fix Name="SOLUS" StarName="SOLU" Airway="W172" Type="V" PreferredRunway="03" DistanceToRunway="03:40,06:44"/>
+      <Fix Name="SOLUS" StarName="SOLU" Airway="W172" Type="X" PreferredRunway="" DistanceToRunway="03:38"/>
+      <Fix Name="WAVES" StarName="WAVE" Airway="T12" Type="A" PreferredRunway="21" DistanceToRunway="03:41,06:25,21:34,24:44"/>
+    </FixRunwayRules>
+  </Airport>
+  <!--
+  <Airport ICAO="YBCG">
+    <Runways>
+      <Runway Name="14" />
+      <Runway Name="32" />
+    </Runways>
+    <RunwayModes>
+      <Mode Name="14" RunwayRate="14:150" Dependencies="" />
+      <Mode Name="32" RunwayRate="32:150" Dependencies="" />
+    </RunwayModes>
+    <Sectors>
+      <Sector Name="INL" Fixes="BERNI" />
+      <Sector Name="SDY" Fixes="LAMSI" />
+      <Sector Name="ALL" Fixes="LAMSI,BERNI" />
+    </Sectors>
+    <FixRunwayRules>
+      <Fix Name="LAMSI" StarName="LAMS" Airway="" Type="A" PreferredRunway=""  DistanceToRunway="14:56,32:44"/>
+      <Fix Name="LAMSI" StarName="LAMS" Airway="" Type="Y" PreferredRunway="" DistanceToRunway="14:50,32:41"/>
+      <Fix Name="BERNI" StarName="BERN" Airway="" Type="A" PreferredRunway="" DistanceToRunway="14:67,32:44"/>
+      <Fix Name="BERNI" StarName="BERN" Airway="" Type="Y" PreferredRunway="" DistanceToRunway="14:60"/>
+      <Fix Name="BERNI" StarName="BERN" Airway="" Type="V" PreferredRunway="" DistanceToRunway="14:58,32:46"/>
+    </FixRunwayRules>
+  </Airport>
+  -->
+  <Airport ICAO="YPAD">
+    <Runways>
+      <Runway Name="23" />
+      <Runway Name="05" />
+      <Runway Name="12" />
+      <Runway Name="30" />
+    </Runways>
+    <RunwayModes>
+      <Mode Name="23I" RunwayRate="23:180" Dependencies="" />
+      <Mode Name="05I" RunwayRate="05:180" Dependencies="" />
+      <Mode Name="23/12" RunwayRate="23:120,12:180" Dependencies="" />
+      <Mode Name="05/12" RunwayRate="05:120,12:180" Dependencies="" />
+    </RunwayModes>
+    <Sectors>
+      <Sector Name="AUG" Fixes="RIKAB,SALTY,GULFS,PAMMY,RAYNA" />
+      <Sector Name="TBD" Fixes="ALEXI,BLACK,ELROX,RUSSL,SURGN,DRINA,ATPIP" />
+      <Sector Name="ALL" Fixes="ALEXI,BLACK,ELROX,RUSSL,SURGN,DRINA,ATPIP,RIKAB,SALTY,GULFS,PAMMY,RAYNA" />
+    </Sectors>
+    <FixRunwayRules>
+      <Fix Name="ALEXI" StarName="ALEX" Airway="" Type="V" PreferredRunway="" DistanceToRunway="05:62"/>
+      <Fix Name="ALEXI" StarName="ALEX" Airway="" Type="X" PreferredRunway="" DistanceToRunway="05:56"/>
+      <Fix Name="ALEXI" StarName="ALEX" Airway="" Type="Z" PreferredRunway="" DistanceToRunway="05:59"/>
+      <Fix Name="ATPIP" StarName="ATPIP" Airway="" Type="A" PreferredRunway="" DistanceToRunway="05:49,12:60,23:69"/>
+      <Fix Name="BLACK" StarName="BLAC" Airway="" Type="A" PreferredRunway="" DistanceToRunway="05:68,23:47"/>
+      <Fix Name="BLACK" StarName="BLAC" Airway="" Type="V" PreferredRunway="" DistanceToRunway="05:64"/>
+      <Fix Name="BLACK" StarName="BLAC" Airway="" Type="X" PreferredRunway="" DistanceToRunway="05:64"/>
+      <Fix Name="DRINA" StarName="DRIN" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:53"/>
+      <Fix Name="DRINA" StarName="DRIN" Airway="" Type="Z" PreferredRunway="" DistanceToRunway="23:53"/>
+      <Fix Name="DRINA" StarName="DRIN" Airway="" Type="V" PreferredRunway="" DistanceToRunway="23:55"/>
+      <Fix Name="ELROX" StarName="ELRO" Airway="" Type="V" PreferredRunway="" DistanceToRunway="23:46,05:37,12:40"/>
+      <Fix Name="GULFS" StarName="GULF" Airway="" Type="V" PreferredRunway="" DistanceToRunway="05:22,23:25,12:20"/>
+      <Fix Name="PAMMY" StarName="PAMY" Airway="" Type="V" PreferredRunway="" DistanceToRunway="23:18,05:22,12:16"/>
+      <Fix Name="RAYNA" StarName="RAYN" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:26"/>
+      <Fix Name="RAYNA" StarName="RAYN" Airway="" Type="Z" PreferredRunway="" DistanceToRunway="23:26"/>
+      <Fix Name="RAYNA" StarName="RAYN" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:26"/>
+      <Fix Name="RAYNA" StarName="RAYN" Airway="" Type="V" PreferredRunway="" DistanceToRunway="23:23"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:73"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="Z" PreferredRunway="" DistanceToRunway="23:73,05:51"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="V" PreferredRunway="" DistanceToRunway="23:62,05:49"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="W" PreferredRunway="" DistanceToRunway="05:49"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:73"/>
+      <Fix Name="RUSSL" StarName="RUSSL" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:50,12:64,05:77"/>
+      <Fix Name="RIKAB" StarName="RIKA" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:73"/>
+      <Fix Name="SALTY" StarName="SALT" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:36"/>
+      <Fix Name="SALTY" StarName="SALT" Airway="" Type="Z" PreferredRunway="" DistanceToRunway="23:36,05:28"/>
+      <Fix Name="SALTY" StarName="SALT" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:24,05:25"/>
+      <Fix Name="SALTY" StarName="SALT" Airway="" Type="W" PreferredRunway="" DistanceToRunway="05:25"/>
+      <Fix Name="SURGN" StarName="SURGN" Airway="" Type="A" PreferredRunway="" DistanceToRunway="23:27,12:35,05:53"/>
+    </FixRunwayRules>
+  </Airport>
+  <Airport ICAO="YBBN">
+    <Runways>
+      <Runway Name="19L" />
+      <Runway Name="01R" />
+      <Runway Name="19R" />
+      <Runway Name="01L" />
+    </Runways>
+    <RunwayModes>
+      <Mode Name="19" RunwayRate="19L:180,19R:180" Dependencies=""/>
+      <Mode Name="01" RunwayRate="01L:180,01R:180" Dependencies="" />
+      <Mode Name="SODPROPS" RunwayRate="19R:300" Dependencies="" />
+      <Mode Name="RECIP" RunwayRate="19L:240,19R:240" Dependencies="" />
+    </RunwayModes>
+    <Sectors>
+      <Sector Name="INL" Fixes="BLAKA,GOMOL" />
+      <Sector Name="DOS" Fixes="ENLIP,WOODY" />
+      <Sector Name="BUR" Fixes="MORBI,SMOKA" />
+      <Sector Name="SDY" Fixes="TEBOT,UGTUG," />
+      <Sector Name="ALL" Fixes="BLAKA,ENLIP,GOMOL,MORBI,SMOKA,TEBOT,UGTUG,WOODY" />
+    </Sectors>
+    <FixRunwayRules>
+      <Fix Name="BLAKA" StarName="BLAK" Type="A" Airway="" PreferredRunway="01R,19L" DistanceToRunway="19L:88,19R:84,01L:56,01R:55"/>
+      <Fix Name="BLAKA" StarName="BLAK" Type="X" Airway="" PreferredRunway="" DistanceToRunway="01R:51,19L:69"/>
+      <Fix Name="GOMOL" StarName="GOMO" Type="A" Airway="" PreferredRunway="01R,19L" DistanceToRunway="01L:59,01R:58,19L:84,19R:94"/>
+      <Fix Name="GOMOL" StarName="GOMO" Type="V" Airway="" PreferredRunway="" DistanceToRunway="01R:53,19L:65"/>
+      <Fix Name="GOMOL" StarName="GOMO" Type="X" Airway="" PreferredRunway="" DistanceToRunway="01R:51,19L:68"/>
+      <Fix Name="ENLIP" StarName="ENLI" Type="A" Airway="" PreferredRunway="01L,19L" DistanceToRunway="01L:45,01R:45,19L:92,19R:81"/>
+      <Fix Name="ENLIP" StarName="ENLI" Type="X" Airway="" PreferredRunway="" DistanceToRunway="19L:72,19R:70"/>
+      <Fix Name="WOODY" StarName="WOOD" Type="A" Airway="" PreferredRunway="01L,19R" DistanceToRunway="01L:60,01R:57,19L:64,19R:62"/>
+      <Fix Name="WOODY" StarName="WOOD" Type="V" Airway="" PreferredRunway="" DistanceToRunway="01L:44,19R:49"/>
+      <Fix Name="MORBI" StarName="MORB" Type="A" Airway="" PreferredRunway="01L,19R" DistanceToRunway="19R:50,01L:70,19L:51,01R:66"/>
+      <Fix Name="MORBI" StarName="MORB" Type="V" Airway="" PreferredRunway="01L,19R" DistanceToRunway="19R:42,01L:52,19L:43,01R:52"/>
+      <Fix Name="SMOKA" StarName="SMOK" Type="A" Airway="" PreferredRunway="01L,19R" DistanceToRunway="19R:43,01L:64,19L:54,01R:62"/>
+      <Fix Name="SMOKA" StarName="SMOK" Type="M" Airway="" PreferredRunway="" DistanceToRunway="01R:47"/>
+      <Fix Name="SMOKA" StarName="SMOK" Type="X" Airway="" PreferredRunway="" DistanceToRunway="19R:47,01L:51"/>
+      <Fix Name="TEBOT" StarName="TEBO" Type="A" Airway="" PreferredRunway="01R,19L" DistanceToRunway="19R:45,01L:82,19L:43,01R:83"/>
+      <Fix Name="TEBOT" StarName="TEBO" Type="X" Airway="" PreferredRunway="01R,19L" DistanceToRunway="01R:68"/>
+      <Fix Name="UGTUG" StarName="UGTU" Type="A" Airway="" PreferredRunway="01R,19L" DistanceToRunway="19R:61,01L:65,19L:56,01R:67"/>
+      <Fix Name="UGTUG" StarName="UGTU" Type="X" Airway="" PreferredRunway="01R,19L" DistanceToRunway="19L:47,01R:52"/>
+    </FixRunwayRules>
+  </Airport>
+</MaestroData>

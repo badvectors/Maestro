@@ -20,7 +20,8 @@ namespace Maestro.Common
         public string STAR { get; set; }
         public Position Position { get; set; }
         public int? GroundSpeed { get; set; }
-        public List<RoutePoint> Route { get; set; } = new List<RoutePoint>();
+        public string Route { get; set; }
+        public List<RoutePoint> RoutePoints { get; set; } = new List<RoutePoint>();
         public DateTime UpdateUTC { get; set; }
     }
 }

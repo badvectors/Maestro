@@ -15,6 +15,7 @@ namespace Maestro.Plugin
                 Type = fdr.AircraftTypeAndWake?.Type,
                 Wake = fdr.AircraftTypeAndWake?.WakeCategory,
                 FlightRules = fdr.FlightRules,
+                Route = fdr.Route,
                 Airport = fdr.DesAirport,
                 Runway = fdr.ArrivalRunway?.Runway?.Name ?? null,
                 STAR = fdr.STAR?.Name ?? null
@@ -32,6 +33,7 @@ namespace Maestro.Plugin
             aircraft.UpdateUTC = DateTime.UtcNow;
 
             aircraft.FlightRules = fdr.FlightRules;
+            aircraft.Route = fdr.Route;
             aircraft.Airport = fdr.DesAirport;
             aircraft.Runway = fdr.ArrivalRunway?.Runway?.Name ?? null;
             aircraft.STAR = fdr.STAR?.Name ?? null;
@@ -58,7 +60,7 @@ namespace Maestro.Plugin
 
         public static Aircraft RouteUpdate(Aircraft aircraft, ExtractedRoute parsedRoute)
         {
-            aircraft.Route.Clear();
+            aircraft.RoutePoints.Clear();
 
             foreach (var wpt in parsedRoute)
             {
@@ -70,7 +72,7 @@ namespace Maestro.Plugin
                     Longitude = wpt.Intersection.LatLong.Longitude
                 };
 
-                aircraft.Route.Add(routePoint);
+                aircraft.RoutePoints.Add(routePoint);
             }
 
             return aircraft;
