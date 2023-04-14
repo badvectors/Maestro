@@ -1,0 +1,140 @@
+﻿@using static Maestro.Web.Airspace;
+<h3>Debug</h3>
+
+@foreach (var airport in Airports)
+{
+    <div class="input-group mt-3">
+        <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
+        <div class="form-control">@airport.FullName</div>
+        <button @onclick="() => Remove(airport.ICAOName)" class="btn btn-outline-secondary" type="button">
+            <i class="fa-solid fa-xmark fa-fw"></i>
+        </button>
+    </div>
+
+    <div class="row">
+        @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
+        {
+            var aircrafts = Functions.AircraftData.Where(x => x.Airport == airport.ICAOName && x.Runway == runway.Name).OrderBy(x => x.Slot);
+
+            @if (aircrafts.Count() == 0) continue;
+
+            <table class="table table-bordered mt-3">
+                <tr>
+                    <th>Callsign</th>
+                    <th>Details</th>
+                    <th>Destination</th>
+                    <th>Feeder</th>
+                    <th>To Feeder</th>
+                    <th>To Runway</th>
+                    <th>Total</th>
+                    <th>ETA</th>
+                    <th>Slot</th>
+                    <th>Delta</th>
+                </tr>
+
+                @foreach (var aircraft in aircrafts.Where(x => x.ETA.HasValue))
+                {
+                    <tr>
+                        <td>@aircraft.Callsign</td>
+                        <td>@aircraft.Type / @aircraft.Wake / @aircraft.FlightRules</td>
+                        <td>@aircraft.Airport / @aircraft.Runway / @aircraft.STAR</td>
+                        <td>@aircraft.FeederFix</td>
+                        <td>
+                            @aircraft.DistanceToFeeder /
+                            @if (aircraft.HoursToFeeder != null)
+                            {
+                                @Math.Round(TimeSpan.FromHours(aircraft.HoursToFeeder.Value).TotalMinutes, 2)
+                            }
+                        </td>
+                        <td>
+                            @aircraft.DistanceFromFeeder /
+                            @if (aircraft.HoursFromFeeder != null)
+                            {
+                                @Math.Round(TimeSpan.FromHours(aircraft.HoursFromFeeder.Value).TotalMinutes, 2)
+                            }
+                        </td>
+                        <td>
+                            @if (aircraft.TotalDistance != null)
+                            {
+                                @Math.Round(aircraft.TotalDistance.Value, 2)
+                            } /
+                            @if (aircraft.TotalHours != null)
+                            {
+                                @Math.Round(TimeSpan.FromHours(aircraft.TotalHours.Value).TotalMinutes, 2)
+                            }
+                        </td>
+                        <td>
+                            @if (aircraft.ETA != null)
+                            {
+                                @aircraft.ETA.Value.ToString("HHmm")
+                            }
+                        </td>
+                        <td>
+                            @if (aircraft.Slot != null)
+                            {
+                                @aircraft.Slot.Value.ToString("HHmm")
+                            }
+                        </td>
+                        <td>
+                            @if (aircraft.Delta != null)
+                            {
+                                @aircraft.Delta.Value
+                            }
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+    </div>
+}
+
+@code {
+    private List<Airport> Airports { get; set; } = new List<Airport>();
+    private string ICAO { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Functions.LoadData();
+
+        Functions.AircraftUpdated += Update;
+    }
+
+    private void Update(object sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code != "Enter" && e.Code != "NumpadEnter") return;
+
+        Add();
+    }
+
+    private void Add()
+    {
+        var airport = Airspace.GetAirport(ICAO.Trim().ToUpper());
+
+        if (airport == null)
+        {
+            return;
+        }
+
+        if (!Airports.Any(x => x.ICAOName == airport.ICAOName))
+        {
+            Airports.Add(airport);
+        }
+
+        ICAO = string.Empty;
+    }
+
+    private void Remove(string icao)
+    {
+        var airport = Airports.FirstOrDefault(x => x.ICAOName == icao);
+
+        if (airport == null) return;
+
+        Airports.Remove(airport);
+    }
+}

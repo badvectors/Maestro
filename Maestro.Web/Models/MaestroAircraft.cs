@@ -1,6 +1,7 @@
 ﻿using Maestro.Web;
 using Maestro.Web.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using vatSysServer.Models;
@@ -29,6 +30,7 @@ namespace Maestro.Common
 
             FindFeederFix();
             CalculateDistance();
+            CalculateETA();
         }
 
         public string FeederFix { get; set; }
@@ -39,16 +41,9 @@ namespace Maestro.Common
         public double? HoursFromFeeder { get; set; }
         public double? TotalHours => HoursToFeeder + HoursFromFeeder;
         public double? TotalDistance => DistanceToFeeder + DistanceFromFeeder;
-        public DateTime? ETA
-        {
-            get
-            {
-                if (!TotalHours.HasValue || TotalHours.Value == 0) return null;
-
-                return DateTime.UtcNow.AddHours(TotalHours.Value);
-            }
-        }
-        public TrendDirection Trend { get; set; }
+        public DateTime? ETA { get; set; }
+        public DateTime? Slot { get; set; }
+        public TimeSpan? Delta => ETA.HasValue && Slot.HasValue ? ETA.Value.Subtract(Slot.Value) : null;
 
         public void Update(Aircraft aircraft)
         {
@@ -65,7 +60,12 @@ namespace Maestro.Common
             UpdateUTC = aircraft.UpdateUTC;
 
             FindFeederFix();
+        }
+
+        public void Recalculate()
+        {
             CalculateDistance();
+            CalculateETA();
         }
 
         private void FindFeederFix()
@@ -166,7 +166,11 @@ namespace Maestro.Common
                 {
                     var distanceOk = double.TryParse(runwayDistance.Split(":")[1], out var distance);
 
-                    if (!distanceOk) return;
+                    if (!distanceOk && distance == 0)
+                    {
+                        HoursFromFeeder = 0;
+                        return;
+                    }
 
                     DistanceFromFeeder = Math.Round(distance, 2);
                     HoursFromFeeder = DistanceFromFeeder / pdLevel.DescentSpeed.Speed;
@@ -193,8 +197,31 @@ namespace Maestro.Common
                 }
 
                 DistanceFromFeeder = Math.Round(distanceToGo, 2);
-                HoursFromFeeder = DistanceFromFeeder / pdLevel.DescentSpeed.Speed;
+
+                if (distanceToGo == 0)
+                {
+                    HoursFromFeeder = 0;
+                    return;
+                }
+
+                var speed = pdLevel.DescentSpeed.Speed;
+
+                if (GroundSpeed < speed) speed = GroundSpeed.Value;
+
+                HoursFromFeeder = DistanceFromFeeder / speed;
             }
+        }
+
+        private void CalculateETA()
+        {
+            if (!TotalHours.HasValue || TotalHours.Value == 0)
+            {
+                //Trend = TrendDirection.None;
+                ETA = null;
+                return;
+            }
+
+            ETA = DateTime.UtcNow.AddHours(TotalHours.Value).RoundToMinutes();
         }
 
         public enum TrendDirection

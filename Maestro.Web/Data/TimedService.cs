@@ -32,7 +32,11 @@ namespace Maestro.Web.Data
                     Functions.Remove(aircraft);
                     continue;
                 }
+
+                aircraft.Recalculate();
             }
+
+            Functions.Slots();
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

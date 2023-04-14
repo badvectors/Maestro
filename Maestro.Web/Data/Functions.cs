@@ -20,6 +20,7 @@ namespace Maestro.Web
         public static MaestroData MaestroData { get; set;} = new();
 
         public static event EventHandler AircraftUpdated;
+        public static bool UpdatingSlots { get; set; }
 
         public static void Update(Aircraft aircraft)
         {
@@ -35,6 +36,60 @@ namespace Maestro.Web
             }
 
             AircraftUpdated?.Invoke(null, new EventArgs());
+        }
+
+        public static void Slots()
+        {
+            if (UpdatingSlots) return;
+
+            UpdatingSlots = true;
+
+            var airports = AircraftData.GroupBy(x => x.Airport);
+
+            foreach (var airport in airports)
+            {
+                //var slots = airport.Where(x => x.Slot.HasValue).Select(x => x.Slot.Value).ToList();
+                var slots = new List<DateTime>();
+
+                foreach (var aircraft in airport.OrderBy(x => x.ETA))
+                {
+                    if (!aircraft.ETA.HasValue)
+                    {
+                        continue;
+                    }
+
+                    if (aircraft.Slot.HasValue)
+                    {
+                        // if (aircraft.Slot.Value == aircraft.ETA.Value) continue;
+
+                        // slots.Remove(aircraft.Slot.Value);
+                    }
+
+                    //if (aircraft.DistanceToFeeder > 30) continue;
+
+                    var closestMinute = aircraft.ETA.Value;
+
+                    while (true)
+                    {
+                        var conflict = slots.Any(x => x == closestMinute || 
+                            x > closestMinute.AddMinutes(-2) && x < closestMinute ||
+                            x < closestMinute.AddMinutes(2) && x > closestMinute);
+
+                        if (conflict)
+                            closestMinute = closestMinute.AddMinutes(1);
+                        else 
+                            break;
+                    }
+
+                    aircraft.Slot = closestMinute;
+
+                    slots.Add(closestMinute);
+
+                    AircraftUpdated?.Invoke(null, new EventArgs());
+                }
+            }
+
+            UpdatingSlots = false;
         }
 
         public static void Remove(MaestroAircraft aircraft)
