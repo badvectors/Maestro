@@ -25,7 +25,7 @@ namespace Maestro.Web.Data
 
         private void DoWork(object state)
         {
-            foreach (var aircraft in Functions.Aircraft.ToList())
+            foreach (var aircraft in Functions.AircraftData.ToList())
             {
                 if (DateTime.UtcNow.Subtract(aircraft.UpdateUTC) > TimeSpan.FromMinutes(1))
                 {

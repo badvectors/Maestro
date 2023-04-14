@@ -7,22 +7,30 @@ using vatSysServer.Models;
 
 namespace Maestro.Common
 {
-    public class AircraftData
+    public class MaestroAircraft : Aircraft
     {
-        public AircraftData() { }
+        public MaestroAircraft() { }
 
-        public AircraftData(Aircraft aircraft) : this()
+        public MaestroAircraft(Aircraft aircraft) : this()
         { 
             Callsign = aircraft.Callsign;
             SweatBox = aircraft.SweatBox;
+            Type = aircraft.Type;
+            FlightRules = aircraft.FlightRules;
+            Wake = aircraft.Wake;
+            Airport = aircraft.Airport;
+            Runway = aircraft.Runway;
+            STAR = aircraft.STAR;
+            Position = aircraft.Position;
+            GroundSpeed = aircraft.GroundSpeed;
+            Route = aircraft.Route;
+            RoutePoints = aircraft.RoutePoints;
+            UpdateUTC = aircraft.UpdateUTC;
 
-            FindFeederFix(aircraft);
-
-            CalculateDistance(aircraft);
+            FindFeederFix();
+            CalculateDistance();
         }
 
-        public string Callsign { get; set; }
-        public bool SweatBox { get; set; }
         public string FeederFix { get; set; }
         public bool FeederPassed { get; set; }
         public double? DistanceToFeeder { get; set; }
@@ -44,14 +52,25 @@ namespace Maestro.Common
 
         public void Update(Aircraft aircraft)
         {
-            FindFeederFix(aircraft);
+            Type = aircraft.Type;
+            FlightRules = aircraft.FlightRules;
+            Wake = aircraft.Wake;
+            Airport = aircraft.Airport;
+            Runway = aircraft.Runway;
+            STAR = aircraft.STAR;
+            Position = aircraft.Position;
+            GroundSpeed = aircraft.GroundSpeed;
+            Route = aircraft.Route;
+            RoutePoints = aircraft.RoutePoints;
+            UpdateUTC = aircraft.UpdateUTC;
 
-            CalculateDistance(aircraft);
+            FindFeederFix();
+            CalculateDistance();
         }
 
-        private void FindFeederFix(Aircraft aircraft)
+        private void FindFeederFix()
         {
-            var airportData = Functions.MaestroData.Airport.FirstOrDefault(x => x.ICAO == aircraft.Airport);
+            var airportData = Functions.MaestroData.Airport?.FirstOrDefault(x => x.ICAO == Airport);
 
             if (airportData == null)
             {
@@ -59,9 +78,9 @@ namespace Maestro.Common
                 return; 
             }
 
-            if (aircraft.STAR != null)
+            if (STAR != null)
             {
-                string starName = Regex.Match(aircraft.STAR, @"^[^0-9]*").Value;
+                string starName = Regex.Match(STAR, @"^[^0-9]*").Value;
 
                 var feederFix = airportData.FixRunwayRules.FirstOrDefault(x => x.StarName == starName);
 
@@ -69,13 +88,30 @@ namespace Maestro.Common
 
                 FeederFix = feederFix.Name;
             }
+            else if (Route != null) 
+            {
+                var route = Route.Split(" ").Reverse();
+
+                foreach (var point in route)
+                {
+                    var feederFix = airportData.FixRunwayRules.FirstOrDefault(x => x.Airway == point);
+
+                    if (feederFix == null) continue;
+
+                    FeederFix = feederFix.Name;
+
+                    Runway ??= feederFix.DistanceToRunway.Split(",")[0].Split(":")[0];
+
+                    return;
+                }
+            }
         }
 
-        private void CalculateDistance(Aircraft aircraft)
+        private void CalculateDistance()
         {
-            if (aircraft.Position == null || FeederFix == null) return;
+            if (Position == null || FeederFix == null) return;
 
-            var feederRoutePoint = aircraft.RoutePoints.FirstOrDefault(x => x.Name == FeederFix);
+            var feederRoutePoint = RoutePoints.FirstOrDefault(x => x.Name == FeederFix);
 
             if (feederRoutePoint == null)
             {
@@ -85,13 +121,11 @@ namespace Maestro.Common
                 return;
             }
 
-            var atw = new Performance.AircraftTypeAndWake()
+            var performance = Performance.GetPerformanceData(new Performance.AircraftTypeAndWake()
             {
-                Type = aircraft.Type,
-                WakeCategory = aircraft.Wake
-            };
-
-            var performance = Performance.GetPerformanceData(atw);
+                Type = Type,
+                WakeCategory = Wake
+            });
 
             if (!feederRoutePoint.Passed)
             {
@@ -99,9 +133,9 @@ namespace Maestro.Common
 
                 double distanceToFeeder = 0;
 
-                var lastPos = new Coordinate(aircraft.Position.Latitude, aircraft.Position.Longitude);
+                var lastPos = new Coordinate(Position.Latitude, Position.Longitude);
 
-                foreach (var routePoint in aircraft.RoutePoints.Where(x => !x.Passed))
+                foreach (var routePoint in RoutePoints.Where(x => !x.Passed))
                 {
                     var position = new Coordinate(routePoint.Latitude, routePoint.Longitude);
 
@@ -110,15 +144,15 @@ namespace Maestro.Common
                     if (routePoint.Name == FeederFix)
                     {
                         DistanceToFeeder = Math.Round(distanceToFeeder, 2);
-                        if (aircraft.GroundSpeed == 0) HoursToFeeder = null;
-                        else HoursToFeeder = DistanceToFeeder / aircraft.GroundSpeed;
+                        if (GroundSpeed == 0) HoursToFeeder = null;
+                        else HoursToFeeder = DistanceToFeeder / GroundSpeed;
                         break;
                     }
 
                     lastPos = position;
                 }
 
-                var airportData = Functions.MaestroData.Airport.FirstOrDefault(x => x.ICAO == aircraft.Airport);
+                var airportData = Functions.MaestroData.Airport.FirstOrDefault(x => x.ICAO == Airport);
 
                 var feederFix = airportData.FixRunwayRules.FirstOrDefault(x => x.Name == FeederFix);
 
@@ -126,7 +160,7 @@ namespace Maestro.Common
 
                 var runwayDistances = feederFix.DistanceToRunway.Split(",");
 
-                var runwayDistance = runwayDistances.FirstOrDefault(x => x.Contains(aircraft.Runway));
+                var runwayDistance = runwayDistances.FirstOrDefault(x => x.Contains(Runway));
 
                 if (runwayDistance != null && FeederPassed == false)
                 {
@@ -140,16 +174,16 @@ namespace Maestro.Common
             }
             else
             {
-                var pdLevel = performance.GetNearestDataToLevel(aircraft.Altitude ?? 5000);
+                var pdLevel = performance.GetNearestDataToLevel(Altitude ?? 5000);
 
                 DistanceToFeeder = 0;
                 HoursToFeeder = 0;
 
                 double distanceToGo = 0;
 
-                var lastPos = new Coordinate(aircraft.Position.Latitude, aircraft.Position.Longitude);
+                var lastPos = new Coordinate(Position.Latitude, Position.Longitude);
 
-                foreach (var routePoint in aircraft.RoutePoints.Where(x => !x.Passed))
+                foreach (var routePoint in RoutePoints.Where(x => !x.Passed))
                 {
                     var position = new Coordinate(routePoint.Latitude, routePoint.Longitude);
 

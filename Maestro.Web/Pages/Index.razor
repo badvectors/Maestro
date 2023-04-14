@@ -3,65 +3,10 @@
 
 <PageTitle>MAESTRO</PageTitle>
 
-<table class="table table-bordered">
-    <tr>
-        <th>Callsign</th>
-        <th>Details</th>
-        <th>Destination</th>
-        <th>Feeder</th>
-        <th>To Feeder</th>
-        <th>To Runway</th>
-        <th>Total</th>
-        <th>ETA</th>
-    </tr>
-
-    @foreach (var aircraft in Functions.Aircraft.Where(x => x.Airport == "YMML").OrderBy(x => x.Airport).ThenBy(x => x.Runway))
-    {
-        var aircraftData = Functions.AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
-
-        <tr>
-            <td>@aircraft.Callsign</td>
-            <td>@aircraft.Type / @aircraft.Wake / @aircraft.FlightRules</td>
-            <td>@aircraft.Airport / @aircraft.Runway / @aircraft.STAR</td>
-            <td>@aircraftData?.FeederFix</td>
-            <td> @aircraftData?.DistanceToFeeder /
-                @if (aircraftData?.HoursToFeeder != null)
-                {
-                    @Math.Round(TimeSpan.FromHours(aircraftData.HoursToFeeder.Value).TotalMinutes, 2)
-                }
-            </td>
-            <td>
-                @aircraftData?.DistanceFromFeeder /
-                @if (aircraftData?.HoursFromFeeder != null)
-                {
-                    @Math.Round(TimeSpan.FromHours(aircraftData.HoursFromFeeder.Value).TotalMinutes, 2)
-                }
-            </td>
-            <td>
-                @if (aircraftData?.TotalDistance != null)
-                {
-                    @Math.Round(aircraftData.TotalDistance.Value, 2)
-                } /
-                @if (aircraftData?.TotalHours != null)
-                {
-                    @Math.Round(TimeSpan.FromHours(aircraftData.TotalHours.Value).TotalMinutes, 2)
-                }
-            </td>
-            <td>
-                @if (aircraftData?.ETA != null)
-                {
-                    @aircraftData.ETA.Value.ToString("HHmm")   
-                }
-            </td>
-        </tr>
-    }
-
-</table>
-
-@*@foreach (var airport in Airports)
+@foreach (var airport in Airports)
 {
     <div class="input-group">
-        <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
+        <span @onclick="Debug" class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
         <div class="form-control">@airport.FullName</div>
         <button @onclick="() => Remove(airport.ICAOName)" class="btn btn-outline-secondary" type="button">
             <i class="fa-solid fa-xmark fa-fw"></i>
@@ -71,7 +16,7 @@
     <div class="row">
         @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
         {
-            var aircraft = Functions.Aircraft.Where(x => x.Airport == airport.ICAOName && x.Runway == runway.Name);
+            var aircraft = Functions.AircraftData.Where(x => x.Airport == airport.ICAOName && x.Runway == runway.Name && x.ETA.HasValue).OrderBy(x => x.ETA);
 
             @if (aircraft.Any(x => x.GroundSpeed > 30))
             {
@@ -86,6 +31,12 @@
                             {
                                 <tr>
                                     <td>
+                                        <h4 class="float-end">
+                                            @if (ac?.ETA != null)
+                                            {
+                                                @ac.ETA.Value.ToString("HHmm")
+                                            }
+                                        </h4>
                                         <b>@ac.Callsign</b>  <br />
                                         <small class="text-muted">
                                             @ac.Wake/@ac.FlightRules/@ac.STAR
@@ -99,6 +50,63 @@
             }
         }
     </div>
+
+    @if (ShowDebug)
+    {
+        <table class="table table-bordered mt-3">
+            <tr>
+                <th>Callsign</th>
+                <th>Details</th>
+                <th>Destination</th>
+                <th>Feeder</th>
+                <th>To Feeder</th>
+                <th>To Runway</th>
+                <th>Total</th>
+                <th>ETA</th>
+            </tr>
+
+            @foreach (var aircraft in Functions.AircraftData.Where(x => x.Airport == airport.ICAOName).OrderBy(x => x.Runway))
+            {
+                <tr>
+                    <td>@aircraft.Callsign</td>
+                    <td>@aircraft.Type / @aircraft.Wake / @aircraft.FlightRules</td>
+                    <td>@aircraft.Airport / @aircraft.Runway / @aircraft.STAR</td>
+                    <td>@aircraft?.FeederFix</td>
+                    <td>
+                        @aircraft?.DistanceToFeeder /
+                        @if (aircraft?.HoursToFeeder != null)
+                        {
+                            @Math.Round(TimeSpan.FromHours(aircraft.HoursToFeeder.Value).TotalMinutes, 2)
+                        }
+                    </td>
+                    <td>
+                        @aircraft?.DistanceFromFeeder /
+                        @if (aircraft?.HoursFromFeeder != null)
+                        {
+                            @Math.Round(TimeSpan.FromHours(aircraft.HoursFromFeeder.Value).TotalMinutes, 2)
+                        }
+                    </td>
+                    <td>
+                        @if (aircraft?.TotalDistance != null)
+                        {
+                            @Math.Round(aircraft.TotalDistance.Value, 2)
+                        } /
+                        @if (aircraft?.TotalHours != null)
+                        {
+                            @Math.Round(TimeSpan.FromHours(aircraft.TotalHours.Value).TotalMinutes, 2)
+                        }
+                    </td>
+                    <td>
+                        @if (aircraft?.ETA != null)
+                        {
+                            @aircraft.ETA.Value.ToString("HHmm")
+                        }
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
 }
 
 @if (!Airports.Any())
@@ -110,11 +118,12 @@
             <i class="fa-solid fa-check fa-fw"></i>
         </button>
     </div>
-}*@
+}
 
 @code {
     private List<Airport> Airports { get; set; } = new List<Airport>();
     private string ICAO { get; set; }
+    private bool ShowDebug { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,6 +135,12 @@
     private void Update(object sender, EventArgs e)
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private void Debug()
+    {
+        if (ShowDebug) ShowDebug = false;
+        else ShowDebug = true;
     }
 
     public void Enter(KeyboardEventArgs e)

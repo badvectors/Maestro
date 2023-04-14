@@ -16,54 +16,30 @@ namespace Maestro.Web
     {
         private readonly static HttpClient Client = new();
 
-        public static List<Aircraft> Aircraft { get; set; } = new();
-        public static List<AircraftData> AircraftData { get; set; } = new();
+        public static List<MaestroAircraft> AircraftData { get; set; } = new();
         public static MaestroData MaestroData { get; set;} = new();
 
         public static event EventHandler AircraftUpdated;
 
         public static void Update(Aircraft aircraft)
         {
-            try
+            var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign && x.SweatBox == aircraft.SweatBox);
+
+            if (aircraftData != null)
             {
-                var existing = Aircraft.FirstOrDefault(x => x.Callsign == aircraft.Callsign && x.SweatBox == aircraft.SweatBox);
-
-                if (existing != null)
-                {
-                    existing.Type = aircraft.Type;
-                    existing.FlightRules = aircraft.FlightRules;
-                    existing.Wake = aircraft.Wake;
-                    existing.Airport = aircraft.Airport;
-                    existing.Runway = aircraft.Runway;
-                    existing.STAR = aircraft.STAR;
-                    existing.Position = aircraft.Position;
-                    existing.GroundSpeed = aircraft.GroundSpeed;
-                    existing.RoutePoints = aircraft.RoutePoints;
-                    existing.UpdateUTC = aircraft.UpdateUTC;
-
-                    var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
-
-                    aircraftData?.Update(aircraft);
-                }
-                else
-                {
-                    Aircraft.Add(aircraft);
-
-                    AircraftData.Add(new AircraftData(aircraft));
-                }
-
-                AircraftUpdated?.Invoke(null, new EventArgs());
+                aircraftData.Update(aircraft);
             }
-            catch { }
+            else
+            {
+                AircraftData.Add(new MaestroAircraft(aircraft));
+            }
+
+            AircraftUpdated?.Invoke(null, new EventArgs());
         }
 
-        public static void Remove(Aircraft aircraft)
+        public static void Remove(MaestroAircraft aircraft)
         {
-            Aircraft.Remove(aircraft);
-
-            var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign);
-
-            if (aircraftData != null) AircraftData.Remove(aircraftData);
+            AircraftData.Remove(aircraft);
 
             AircraftUpdated?.Invoke(null, new EventArgs());
         }
