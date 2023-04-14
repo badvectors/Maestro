@@ -36,7 +36,8 @@ namespace Maestro.Web.Data
                 aircraft.Recalculate();
             }
 
-            Functions.Slots();
+            Functions.Slots(true);
+            Functions.Slots(false);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

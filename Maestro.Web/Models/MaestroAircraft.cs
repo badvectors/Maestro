@@ -43,7 +43,15 @@ namespace Maestro.Common
         public double? TotalDistance => DistanceToFeeder + DistanceFromFeeder;
         public DateTime? ETA { get; set; }
         public DateTime? Slot { get; set; }
+        public bool SlotLocked { get; set; }
         public TimeSpan? Delta => ETA.HasValue && Slot.HasValue ? ETA.Value.Subtract(Slot.Value) : null;
+        public string DeltaDisplay()
+        {
+            if (Delta == null) return null;
+            var delta = Delta;
+            if (delta.Value < TimeSpan.Zero) delta = delta.Value * -1;
+            return delta.Value.TotalMinutes.ToString();
+        }
 
         public void Update(Aircraft aircraft)
         {
@@ -222,14 +230,6 @@ namespace Maestro.Common
             }
 
             ETA = DateTime.UtcNow.AddHours(TotalHours.Value).RoundToMinutes();
-        }
-
-        public enum TrendDirection
-        {
-            None,
-            Stable,
-            Slower,
-            Faster
         }
     }
 }

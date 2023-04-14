@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Maestro.Common;
 @using static Maestro.Web.Airspace;
 
 <PageTitle>MAESTRO</PageTitle>
@@ -17,7 +18,7 @@
         @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
         {
             var aircrafts = Functions.AircraftData.Where(x => x.SweatBox == SweatBox && x.ETA.HasValue && x.Airport == airport.ICAOName && x.Runway == runway.Name).OrderBy(x => x.Slot);
-            
+
             if (aircrafts.Count() == 0) continue;
 
             <div class="col-sm">
@@ -28,20 +29,37 @@
                     <tr>
                         <th style="width: 120px;">Callsign</th>
                         <th>Slot</th>
+                        <th></th>
                     </tr>
 
                     @foreach (var aircraft in aircrafts)
                     {
                         <tr>
-                            <td>@aircraft.Callsign</td>
-                            <td>
+                            <td style="height:35px;">
+                                @aircraft.Callsign
+                            </td>
+                            <td class="@SlotColour(aircraft)">
                                 @if (aircraft.Slot != null)
                                 {
-                                    @aircraft.Slot.Value.ToString("HHmm")
+                                   @aircraft.Slot.Value.ToString("HHmm")
                                 }
                                 @if (aircraft.Delta != null && aircraft.Delta != TimeSpan.Zero)
                                 {
-                                    @:&nbsp; @aircraft.Delta.Value.TotalMinutes
+                                    if (aircraft.Delta < TimeSpan.Zero)
+                                    {
+                                        <i class="fa-solid fa-caret-up"></i>
+                                    }
+                                    if (aircraft.Delta > TimeSpan.Zero)
+                                    {
+                                        <i class="fa-solid fa-caret-down"></i>
+                                    }
+                                    @aircraft.DeltaDisplay()
+                                }
+                            </td>
+                            <td style="width:15px;">
+                                @if (aircraft.SlotLocked)
+                                {
+                                    <i @onclick="() => Functions.UnlockSlot(aircraft)" class="fa-solid fa-unlock"></i>
                                 }
                             </td>
                         </tr>
@@ -73,7 +91,7 @@ else
 <nav class="navbar fixed-bottom navbar-light bg-light">
     <div class="container-fluid">
         <div class="form-check form-switch">
-            <input @onchange="ToggleSweatBox" value="@SweatBox" class="form-check-input" type="checkbox" id="sweatBoxSwitch">
+            <input @bind="SweatBox" class="form-check-input" type="checkbox" id="sweatBoxSwitch">
             <label class="form-check-label" for="sweatBoxSwitch">Sweat Box</label>
         </div>
     </div>
@@ -83,7 +101,7 @@ else
     private List<Airport> Airports { get; set; } = new List<Airport>();
     private string ICAO { get; set; }
     private bool SweatBox { get; set; }
-    private bool ShowAdd { get; set; }
+    private bool ShowAdd { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,6 +115,12 @@ else
         InvokeAsync(StateHasChanged);
     }
 
+    private string SlotColour(MaestroAircraft aircraft)
+    {
+        if (aircraft.SlotLocked) return "text-primary";
+        return "text-dark";
+    }
+
     public void Enter(KeyboardEventArgs e)
     {
         if (e.Code != "Enter" && e.Code != "NumpadEnter") return;
@@ -108,11 +132,6 @@ else
     {
         ICAO = string.Empty;
         ShowAdd = true;   
-    }
-
-    private void ToggleSweatBox(ChangeEventArgs e)
-    {
-        SweatBox = (bool) e.Value;
     }
 
     private void Add()

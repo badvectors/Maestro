@@ -38,34 +38,24 @@ namespace Maestro.Web
             AircraftUpdated?.Invoke(null, new EventArgs());
         }
 
-        public static void Slots()
+        public static void Slots(bool sweatbox)
         {
             if (UpdatingSlots) return;
 
             UpdatingSlots = true;
 
-            var airports = AircraftData.GroupBy(x => x.Airport);
+            var airports = AircraftData.Where(x => x.SweatBox == sweatbox).GroupBy(x => x.Airport);
 
             foreach (var airport in airports)
             {
-                //var slots = airport.Where(x => x.Slot.HasValue).Select(x => x.Slot.Value).ToList();
-                var slots = new List<DateTime>();
+                var slots = airport.Where(x => x.SlotLocked && x.Slot.HasValue).Select(x => x.Slot.Value).ToList();
 
                 foreach (var aircraft in airport.OrderBy(x => x.ETA))
                 {
-                    if (!aircraft.ETA.HasValue)
+                    if (!aircraft.ETA.HasValue || aircraft.SlotLocked)
                     {
                         continue;
                     }
-
-                    if (aircraft.Slot.HasValue)
-                    {
-                        // if (aircraft.Slot.Value == aircraft.ETA.Value) continue;
-
-                        // slots.Remove(aircraft.Slot.Value);
-                    }
-
-                    //if (aircraft.DistanceToFeeder > 30) continue;
 
                     var closestMinute = aircraft.ETA.Value;
 
@@ -85,11 +75,19 @@ namespace Maestro.Web
 
                     slots.Add(closestMinute);
 
+                    if (aircraft.DistanceToFeeder < 30) aircraft.SlotLocked = true;
+
                     AircraftUpdated?.Invoke(null, new EventArgs());
                 }
             }
 
             UpdatingSlots = false;
+        }
+
+        public static void UnlockSlot(MaestroAircraft aircraft)
+        {
+            aircraft.SlotLocked = false;
+            AircraftUpdated?.Invoke(null, new EventArgs());
         }
 
         public static void Remove(MaestroAircraft aircraft)
