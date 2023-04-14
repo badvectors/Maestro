@@ -16,20 +16,21 @@
     <div class="row">
         @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
         {
-            var aircrafts = Functions.AircraftData.Where(x => x.Airport == airport.ICAOName && x.Runway == runway.Name).OrderBy(x => x.Slot);
+            var aircrafts = Functions.AircraftData.Where(x => x.SweatBox == SweatBox && x.ETA.HasValue && x.Airport == airport.ICAOName && x.Runway == runway.Name).OrderBy(x => x.Slot);
             
             if (aircrafts.Count() == 0) continue;
 
-            <div class="col">
+            <div class="col-sm">
 
-                <table class="table table-bordered mt-3">
+                <h5 class="mt-3">Runway @runway.Name</h5>
+
+                <table class="table table-bordered">
                     <tr>
-                        <th>Callsign</th>
+                        <th style="width: 120px;">Callsign</th>
                         <th>Slot</th>
-                        <th>ETA</th>
                     </tr>
 
-                    @foreach (var aircraft in aircrafts.Where(x => x.ETA.HasValue))
+                    @foreach (var aircraft in aircrafts)
                     {
                         <tr>
                             <td>@aircraft.Callsign</td>
@@ -38,15 +39,9 @@
                                 {
                                     @aircraft.Slot.Value.ToString("HHmm")
                                 }
-                            </td>
-                            <td>
-                                @if (aircraft.ETA != null)
-                                {
-                                    @aircraft.ETA.Value.ToString("HHmm")
-                                }
                                 @if (aircraft.Delta != null && aircraft.Delta != TimeSpan.Zero)
                                 {
-                                    @: : @aircraft.Delta.Value
+                                    @:&nbsp; @aircraft.Delta.Value.TotalMinutes
                                 }
                             </td>
                         </tr>
@@ -58,7 +53,7 @@
     </div>
 }
 
-@if (!Airports.Any())
+@if (ShowAdd)
 {
     <div class="input-group mt-3">
         <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
@@ -68,10 +63,27 @@
         </button>
     </div>
 }
+else
+{
+    <button @onclick="AddButton" class="btn btn-outline-secondary mt-3" type="button">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+}
+
+<nav class="navbar fixed-bottom navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-check form-switch">
+            <input @onchange="ToggleSweatBox" value="@SweatBox" class="form-check-input" type="checkbox" id="sweatBoxSwitch">
+            <label class="form-check-label" for="sweatBoxSwitch">Sweat Box</label>
+        </div>
+    </div>
+</nav>
 
 @code {
     private List<Airport> Airports { get; set; } = new List<Airport>();
     private string ICAO { get; set; }
+    private bool SweatBox { get; set; }
+    private bool ShowAdd { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,6 +104,17 @@
         Add();
     }
 
+    private void AddButton()
+    {
+        ICAO = string.Empty;
+        ShowAdd = true;   
+    }
+
+    private void ToggleSweatBox(ChangeEventArgs e)
+    {
+        SweatBox = (bool) e.Value;
+    }
+
     private void Add()
     {
         var airport = Airspace.GetAirport(ICAO.Trim().ToUpper());
@@ -107,6 +130,8 @@
         }
 
         ICAO = string.Empty;
+
+        ShowAdd = false;
     }
 
     private void Remove(string icao)
@@ -116,5 +141,7 @@
         if (airport == null) return;
 
         Airports.Remove(airport);
+
+        if (Airports.Count == 0) ShowAdd = true;
     }
 }
