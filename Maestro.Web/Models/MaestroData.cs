@@ -1,35 +1,35 @@
-﻿namespace Maestro.Web.Data
+﻿namespace Maestro.Web.Models
 {
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
+    [System.Xml.Serialization.XmlRoot(Namespace = "", IsNullable = false)]
     public partial class MaestroData
     {
 
         private MAESTROAirport[] airportField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Airport")]
+        [System.Xml.Serialization.XmlElement("Airport")]
         public MAESTROAirport[] Airport
         {
             get
             {
-                return this.airportField;
+                return airportField;
             }
             set
             {
-                this.airportField = value;
+                airportField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class MAESTROAirport
     {
 
@@ -44,104 +44,104 @@
         private string iCAOField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Runway", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("Runway", IsNullable = false)]
         public MAESTROAirportRunway[] Runways
         {
             get
             {
-                return this.runwaysField;
+                return runwaysField;
             }
             set
             {
-                this.runwaysField = value;
+                runwaysField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Mode", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("Mode", IsNullable = false)]
         public MAESTROAirportMode[] RunwayModes
         {
             get
             {
-                return this.runwayModesField;
+                return runwayModesField;
             }
             set
             {
-                this.runwayModesField = value;
+                runwayModesField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Sector", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("Sector", IsNullable = false)]
         public MAESTROAirportSector[] Sectors
         {
             get
             {
-                return this.sectorsField;
+                return sectorsField;
             }
             set
             {
-                this.sectorsField = value;
+                sectorsField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Fix", IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItem("Fix", IsNullable = false)]
         public MAESTROAirportFix[] FixRunwayRules
         {
             get
             {
-                return this.fixRunwayRulesField;
+                return fixRunwayRulesField;
             }
             set
             {
-                this.fixRunwayRulesField = value;
+                fixRunwayRulesField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string ICAO
         {
             get
             {
-                return this.iCAOField;
+                return iCAOField;
             }
             set
             {
-                this.iCAOField = value;
+                iCAOField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class MAESTROAirportRunway
     {
 
         private string nameField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class MAESTROAirportMode
     {
 
@@ -152,52 +152,52 @@
         private string dependenciesField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string RunwayRate
         {
             get
             {
-                return this.runwayRateField;
+                return runwayRateField;
             }
             set
             {
-                this.runwayRateField = value;
+                runwayRateField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Dependencies
         {
             get
             {
-                return this.dependenciesField;
+                return dependenciesField;
             }
             set
             {
-                this.dependenciesField = value;
+                dependenciesField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class MAESTROAirportSector
     {
 
@@ -206,38 +206,38 @@
         private string fixesField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Fixes
         {
             get
             {
-                return this.fixesField;
+                return fixesField;
             }
             set
             {
-                this.fixesField = value;
+                fixesField = value;
             }
         }
     }
 
     /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+    [System.Serializable()]
+    [System.ComponentModel.DesignerCategory("code")]
+    [System.Xml.Serialization.XmlType(AnonymousType = true)]
     public partial class MAESTROAirportFix
     {
 
@@ -254,86 +254,86 @@
         private string distanceToRunwayField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Name
         {
             get
             {
-                return this.nameField;
+                return nameField;
             }
             set
             {
-                this.nameField = value;
+                nameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string StarName
         {
             get
             {
-                return this.starNameField;
+                return starNameField;
             }
             set
             {
-                this.starNameField = value;
+                starNameField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Airway
         {
             get
             {
-                return this.airwayField;
+                return airwayField;
             }
             set
             {
-                this.airwayField = value;
+                airwayField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string Type
         {
             get
             {
-                return this.typeField;
+                return typeField;
             }
             set
             {
-                this.typeField = value;
+                typeField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string PreferredRunway
         {
             get
             {
-                return this.preferredRunwayField;
+                return preferredRunwayField;
             }
             set
             {
-                this.preferredRunwayField = value;
+                preferredRunwayField = value;
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttribute()]
         public string DistanceToRunway
         {
             get
             {
-                return this.distanceToRunwayField;
+                return distanceToRunwayField;
             }
             set
             {
-                this.distanceToRunwayField = value;
+                distanceToRunwayField = value;
             }
         }
     }

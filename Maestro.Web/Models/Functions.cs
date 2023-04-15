@@ -7,35 +7,37 @@ using System;
 using Maestro.Common;
 using System.IO;
 using System.Xml.Serialization;
-using Maestro.Web.Data;
-using Maestro.Web.Models;
 
-namespace Maestro.Web
+namespace Maestro.Web.Models
 {
     public class Functions
     {
         private readonly static HttpClient Client = new();
 
         public static List<MaestroAircraft> AircraftData { get; set; } = new();
-        public static MaestroData MaestroData { get; set;} = new();
+        public static MaestroData MaestroData { get; set; } = new();
 
         public static event EventHandler AircraftUpdated;
         public static bool UpdatingSlots { get; set; }
 
         public static void Update(Aircraft aircraft)
         {
-            var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign && x.SweatBox == aircraft.SweatBox);
-
-            if (aircraftData != null)
+            try
             {
-                aircraftData.Update(aircraft);
-            }
-            else
-            {
-                AircraftData.Add(new MaestroAircraft(aircraft));
-            }
+                var aircraftData = AircraftData.FirstOrDefault(x => x.Callsign == aircraft.Callsign && x.SweatBox == aircraft.SweatBox);
 
-            AircraftUpdated?.Invoke(null, new EventArgs());
+                if (aircraftData != null)
+                {
+                    aircraftData.Update(aircraft);
+                }
+                else
+                {
+                    AircraftData.Add(new MaestroAircraft(aircraft));
+                }
+
+                AircraftUpdated?.Invoke(null, new EventArgs());
+            }
+            catch { }
         }
 
         public static void Slots(bool sweatbox)
@@ -61,13 +63,13 @@ namespace Maestro.Web
 
                     while (true)
                     {
-                        var conflict = slots.Any(x => x == closestMinute || 
+                        var conflict = slots.Any(x => x == closestMinute ||
                             x > closestMinute.AddMinutes(-2) && x < closestMinute ||
                             x < closestMinute.AddMinutes(2) && x > closestMinute);
 
                         if (conflict)
                             closestMinute = closestMinute.AddMinutes(1);
-                        else 
+                        else
                             break;
                     }
 
@@ -86,6 +88,7 @@ namespace Maestro.Web
 
         public static void UnlockSlot(MaestroAircraft aircraft)
         {
+            if (!aircraft.SlotLocked) return;
             aircraft.SlotLocked = false;
             AircraftUpdated?.Invoke(null, new EventArgs());
         }

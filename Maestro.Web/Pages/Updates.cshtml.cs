@@ -1,6 +1,5 @@
 using Maestro.Common;
-using Maestro.Web;
-using Maestro.Web.Data;
+using Maestro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

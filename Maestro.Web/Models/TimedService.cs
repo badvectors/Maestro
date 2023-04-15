@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Maestro.Web.Data
+namespace Maestro.Web.Models
 {
     public class TimedService : IHostedService, IDisposable
     {

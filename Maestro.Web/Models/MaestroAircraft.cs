@@ -1,8 +1,7 @@
-﻿using Maestro.Web;
-using Maestro.Web.Models;
+﻿using Maestro.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using vatSysServer.Models;
 
@@ -24,6 +23,7 @@ namespace Maestro.Common
             STAR = aircraft.STAR;
             Position = aircraft.Position;
             GroundSpeed = aircraft.GroundSpeed;
+            Altitude = aircraft.Altitude;
             Route = aircraft.Route;
             RoutePoints = aircraft.RoutePoints;
             UpdateUTC = aircraft.UpdateUTC;
@@ -34,7 +34,7 @@ namespace Maestro.Common
         }
 
         public string FeederFix { get; set; }
-        public bool FeederPassed { get; set; }
+        public bool FeederPassed => RoutePoints.FirstOrDefault(x => x.Name == FeederFix).Passed;
         public double? DistanceToFeeder { get; set; }
         public double? HoursToFeeder { get; set; }
         public double? DistanceFromFeeder { get; set; }
@@ -64,6 +64,7 @@ namespace Maestro.Common
             Position = aircraft.Position;
             GroundSpeed = aircraft.GroundSpeed;
             Route = aircraft.Route;
+            Altitude = aircraft.Altitude;
             RoutePoints = aircraft.RoutePoints;
             UpdateUTC = aircraft.UpdateUTC;
 
@@ -117,7 +118,7 @@ namespace Maestro.Common
 
         private void CalculateDistance()
         {
-            if (Position == null || FeederFix == null) return;
+            if (Position == null || FeederFix == null || GroundSpeed == 0) return;
 
             var feederRoutePoint = RoutePoints.FirstOrDefault(x => x.Name == FeederFix);
 
@@ -135,10 +136,8 @@ namespace Maestro.Common
                 WakeCategory = Wake
             });
 
-            if (!feederRoutePoint.Passed)
+            if (FeederPassed == false)
             {
-                var pdLevel = performance.GetNearestDataToLevel(5000);
-
                 double distanceToFeeder = 0;
 
                 var lastPos = new Coordinate(Position.Latitude, Position.Longitude);
@@ -160,35 +159,84 @@ namespace Maestro.Common
                     lastPos = position;
                 }
 
-                var airportData = Functions.MaestroData.Airport.FirstOrDefault(x => x.ICAO == Airport);
+                double distance = 0;
 
-                var feederFix = airportData.FixRunwayRules.FirstOrDefault(x => x.Name == FeederFix);
+                var distanceOk = false;
 
-                if (feederFix == null) return;
-
-                var runwayDistances = feederFix.DistanceToRunway.Split(",");
-
-                var runwayDistance = runwayDistances.FirstOrDefault(x => x.Contains(Runway));
-
-                if (runwayDistance != null && FeederPassed == false)
+                if (Runway == null || STAR == null)
                 {
-                    var distanceOk = double.TryParse(runwayDistance.Split(":")[1], out var distance);
+                    var airportData = Functions.MaestroData.Airport.FirstOrDefault(x => x.ICAO == Airport);
 
-                    if (!distanceOk && distance == 0)
+                    var feederFix = airportData.FixRunwayRules.FirstOrDefault(x => x.Name == FeederFix);
+
+                    if (feederFix == null) return;
+
+                    var runwayDistances = feederFix.DistanceToRunway.Split(",");
+
+                    var runwayDistance = runwayDistances.FirstOrDefault(x => x.Contains(Runway));
+
+                    distanceOk = double.TryParse(runwayDistance.Split(":")[1], out distance);
+                }
+                else
+                {
+                    foreach (var routePoint in RoutePoints.Where(x => !x.Passed).SkipWhile(x => x.Name != FeederFix))
                     {
-                        HoursFromFeeder = 0;
-                        return;
+                        if (routePoint.Name == FeederFix)
+                        {
+                            lastPos = new Coordinate(routePoint.Latitude, routePoint.Longitude);
+                            continue;
+                        }
+
+                        var position = new Coordinate(routePoint.Latitude, routePoint.Longitude);
+
+                        distance += Conversions.CalculateDistance(lastPos, position);
+
+                        lastPos = position;
                     }
 
-                    DistanceFromFeeder = Math.Round(distance, 2);
-                    HoursFromFeeder = DistanceFromFeeder / pdLevel.DescentSpeed.Speed;
+                    distanceOk = true;
                 }
+
+                if (!distanceOk && distance == 0)
+                {
+                    HoursFromFeeder = 0;
+                    return;
+                }
+
+                DistanceFromFeeder = Math.Round(distance, 2);
+
+                double hoursFromFeeder = 0;
+
+                var pdLevel1 = performance.GetNearestDataToLevel(20000); // 30nm+ 
+
+                var dist1 = Math.Max(0, DistanceFromFeeder.Value - 30);
+
+                if (dist1 != 0) hoursFromFeeder += dist1 / pdLevel1.DescentSpeed.Speed;
+
+                var pdLevel2 = performance.GetNearestDataToLevel(10000); // 20-30nm
+
+                var dist2 = Math.Max(0, DistanceFromFeeder.Value - dist1 - 10);
+
+                if (dist2 != 0) hoursFromFeeder += dist2 / pdLevel2.DescentSpeed.Speed;
+
+                var pdLevel3 = performance.GetNearestDataToLevel(5000); // 10-20nm
+
+                var dist3 = Math.Max(0, DistanceFromFeeder.Value - dist1 - dist2 - 10);
+
+                if (dist3 != 0) hoursFromFeeder += dist3 / pdLevel3.DescentSpeed.Speed;
+
+                var pdLevel4 = performance.GetNearestDataToLevel(3000); // 0-10nm
+
+                var dist4 = DistanceFromFeeder.Value < 10 ? DistanceFromFeeder.Value : 10;
+
+                if (dist4 != 0) hoursFromFeeder += dist4 / pdLevel4.DescentSpeed.Speed;
+
+                HoursFromFeeder = hoursFromFeeder;
             }
             else
             {
-                var pdLevel = performance.GetNearestDataToLevel(Altitude ?? 5000);
-
                 DistanceToFeeder = 0;
+
                 HoursToFeeder = 0;
 
                 double distanceToGo = 0;
@@ -212,17 +260,39 @@ namespace Maestro.Common
                     return;
                 }
 
-                var speed = pdLevel.DescentSpeed.Speed;
+                double hoursFromFeeder = 0;
 
-                if (GroundSpeed < speed) speed = GroundSpeed.Value;
+                var pdLevel1 = performance.GetNearestDataToLevel(20000); // 30nm+ 
 
-                HoursFromFeeder = DistanceFromFeeder / speed;
+                var dist1 = Math.Max(0, DistanceFromFeeder.Value - 30);
+
+                if (dist1 != 0) hoursFromFeeder += dist1 / (DistanceFromFeeder.Value >= 30 ? GroundSpeed.Value : pdLevel1.DescentSpeed.Speed);
+
+                var pdLevel2 = performance.GetNearestDataToLevel(10000); // 20-30nm
+
+                var dist2 = Math.Max(0, DistanceFromFeeder.Value - dist1 - 10);
+
+                if (dist2 != 0) hoursFromFeeder += dist2 / (DistanceFromFeeder.Value < 30 && DistanceFromFeeder.Value >= 20 ? GroundSpeed.Value : pdLevel2.DescentSpeed.Speed);
+
+                var pdLevel3 = performance.GetNearestDataToLevel(5000); // 10-20nm
+
+                var dist3 = Math.Max(0, DistanceFromFeeder.Value - dist1 - dist2 - 10);
+
+                if (dist3 != 0) hoursFromFeeder += dist3 / (DistanceFromFeeder.Value < 20 && DistanceFromFeeder.Value >= 10 ? GroundSpeed.Value : pdLevel3.DescentSpeed.Speed);
+
+                var pdLevel4 = performance.GetNearestDataToLevel(3000); // 0-10nm
+
+                var dist4 = DistanceFromFeeder.Value < 10 ? DistanceFromFeeder.Value : 10;
+
+                if (dist4 != 0) hoursFromFeeder += dist4 / (DistanceFromFeeder.Value < 10 ? GroundSpeed.Value : pdLevel4.DescentSpeed.Speed);
+
+                HoursFromFeeder = hoursFromFeeder;
             }
         }
 
         private void CalculateETA()
         {
-            if (!TotalHours.HasValue || TotalHours.Value == 0)
+            if (!TotalHours.HasValue || double.IsInfinity(TotalHours.Value) || TotalHours.Value == 0)
             {
                 //Trend = TrendDirection.None;
                 ETA = null;

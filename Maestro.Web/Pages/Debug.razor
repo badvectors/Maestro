@@ -1,4 +1,8 @@
-﻿@using static Maestro.Web.Airspace;
+﻿@page "/debug"
+
+@using static Maestro.Web.Models.Airspace;
+@using Maestro.Web.Models;
+
 <h3>Debug</h3>
 
 @foreach (var airport in Airports)
@@ -88,6 +92,14 @@
         }
     </div>
 }
+
+<div class="input-group mt-3">
+    <span class="input-group-text"><i class="fa-solid fa-plane-arrival"></i></span>
+    <input @bind="ICAO" @oninput="(e)=> ICAO = e.Value.ToString()" @onkeydown="Enter" type="text" class="form-control" placeholder="ICAO code">
+    <button @onclick="Add" class="btn btn-outline-secondary" type="button">
+        <i class="fa-solid fa-check fa-fw"></i>
+    </button>
+</div>
 
 @code {
     private List<Airport> Airports { get; set; } = new List<Airport>();

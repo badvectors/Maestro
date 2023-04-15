@@ -5,25 +5,21 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-namespace Maestro.Web
+namespace Maestro.Web.Models
 {
     public static class Airspace
     {
-        private static Dictionary<string, Airport> Airports = new Dictionary<string, Airport>();
-        private static Dictionary<string, Airway> Airways = new Dictionary<string, Airway>();
-        private static Dictionary<string, List<Intersection>> Intersections = new Dictionary<string, List<Intersection>>();
-        private static List<SystemRunway> SystemRunways = new List<SystemRunway>();
-
-        private static List<SIDSTAR> SidStars = new List<SIDSTAR>();
-        private static List<Approach> Apchs = new List<Approach>();
-
-        public static bool Loaded = false;
+        private static readonly Dictionary<string, Airport> Airports = new();
+        private static readonly Dictionary<string, Airway> Airways = new();
+        private static readonly Dictionary<string, List<Intersection>> Intersections = new();
+        private static readonly List<SystemRunway> SystemRunways = new();
+        private static readonly List<SIDSTAR> SidStars = new();
+        private static readonly List<Approach> Apchs = new();
 
         public static void LoadNavData(XmlDocument doc, bool clearExisting = true)
         {
             if (clearExisting)
             {
-                Loaded = false;
                 Airports.Clear();
                 Airways.Clear();
                 Intersections.Clear();
@@ -39,7 +35,6 @@ namespace Maestro.Web
             XmlNodeList eList = doc.GetElementsByTagName("Airspace");
             if (eList.Count < 1)
             {
-                Loaded = true;
                 return;
             }
 
@@ -54,7 +49,7 @@ namespace Maestro.Web
                 {
                     if (!point.HasAttribute("Name"))
                         continue;
-                    Intersection wp = new Intersection(point.GetAttribute("Name").Trim().ToUpperInvariant(), new Coordinate(point.InnerText.Trim()));
+                    Intersection wp = new(point.GetAttribute("Name").Trim().ToUpperInvariant(), new Coordinate(point.InnerText.Trim()));
                     if (point.GetAttribute("Type") == "Navaid")
                         wp.NavaidType = (Intersection.NavaidTypes)Enum.Parse(typeof(Intersection.NavaidTypes), point.GetAttribute("NavaidType"));
 
@@ -77,9 +72,11 @@ namespace Maestro.Web
                     if (!airport.HasAttribute("ICAO") || !airport.HasAttribute("Position"))
                         continue;
 
-                    Airport port = new Airport();
-                    port.ICAOName = airport.GetAttribute("ICAO").Trim().ToUpperInvariant();
-                    port.LatLong = new Coordinate(airport.GetAttribute("Position").Trim().ToUpperInvariant());
+                    Airport port = new()
+                    {
+                        ICAOName = airport.GetAttribute("ICAO").Trim().ToUpperInvariant(),
+                        LatLong = new Coordinate(airport.GetAttribute("Position").Trim().ToUpperInvariant())
+                    };
 
                     if (airport.GetAttribute("Elevation") != "")
                         port.Elevation = int.Parse(airport.GetAttribute("Elevation").Trim().ToUpperInvariant());
@@ -92,7 +89,7 @@ namespace Maestro.Web
                         if (!rwy.HasAttribute("Name") || !rwy.HasAttribute("Position"))
                             continue;
 
-                        Airport.Runway runway = new Airport.Runway(rwy.GetAttribute("Name").Trim().ToUpperInvariant(), new Coordinate(rwy.GetAttribute("Position").Trim().ToUpperInvariant()));
+                        Airport.Runway runway = new(rwy.GetAttribute("Name").Trim().ToUpperInvariant(), new Coordinate(rwy.GetAttribute("Position").Trim().ToUpperInvariant()));
                         port.Runways.Add(runway);
                     }
 
@@ -121,8 +118,10 @@ namespace Maestro.Web
                 XmlNodeList airways = airwaysSection.GetElementsByTagName("Airway");
                 foreach (XmlElement airway in airways)
                 {
-                    Airway awy = new Airway();
-                    awy.Name = airway.GetAttribute("Name").Trim().ToUpperInvariant();
+                    Airway awy = new()
+                    {
+                        Name = airway.GetAttribute("Name").Trim().ToUpperInvariant()
+                    };
                     string inner = airway.InnerText.Replace('\r', ' ').Replace('\n', ' ').Trim();
 
                     if (inner == "")
@@ -168,7 +167,7 @@ namespace Maestro.Web
                 XmlNodeList starsList = sidstarsSection.GetElementsByTagName("STAR");
                 XmlNodeList appsList = sidstarsSection.GetElementsByTagName("Approach");
 
-                foreach (XmlElement ss in sidsList.Cast<XmlNode>().Concat(starsList.Cast<XmlNode>().Concat(appsList.Cast<XmlNode>())))
+                foreach (XmlElement ss in sidsList.Cast<XmlNode>().Concat(starsList.Cast<XmlNode>().Concat(appsList.Cast<XmlNode>())).Cast<XmlElement>())
                 {
                     if (!ss.HasAttribute("Name") || !ss.HasAttribute("Airport"))
                         continue;
@@ -185,24 +184,26 @@ namespace Maestro.Web
 
                     if (ss.Name == "Approach")
                     {
-                        approach = new Approach();
-                        approach.Name = name;
-                        approach.Airport = airport;
-                        approach.Runway = airport.Runways.SingleOrDefault(r => r.Name == ss.GetAttribute("Runway").Trim().ToUpperInvariant());
+                        approach = new Approach
+                        {
+                            Name = name,
+                            Airport = airport,
+                            Runway = airport.Runways.SingleOrDefault(r => r.Name == ss.GetAttribute("Runway").Trim().ToUpperInvariant())
+                        };
                         if (approach.Runway == null)
                             continue;
                     }
                     else
                     {
-                        sidstar = new SIDSTAR();
-                        sidstar.Name = name;
-                        sidstar.Airport = airport;
+                        sidstar = new SIDSTAR
+                        {
+                            Name = name,
+                            Airport = airport
+                        };
                         string[] rwys = ss.GetAttribute("Runways").Trim().ToUpperInvariant().Split(',');
                         foreach (string r in rwys)
                         {
-                            Airport.Runway rwy = airport.Runways.SingleOrDefault(rr => rr.Name == r.Trim().ToUpperInvariant());
-                            if (rwy == null)
-                                throw new Exception(name + " runway not found: " + r);
+                            Airport.Runway rwy = airport.Runways.SingleOrDefault(rr => rr.Name == r.Trim().ToUpperInvariant()) ?? throw new Exception(name + " runway not found: " + r);
                             if (!sidstar.Runways.Contains(rwy))
                                 sidstar.Runways.Add(rwy);
                         }
@@ -211,14 +212,14 @@ namespace Maestro.Web
                     XmlNodeList rtes = ss.GetElementsByTagName("Route");
                     foreach (XmlElement rte in rtes)
                     {
-                        List<Intersection> ints = new List<Intersection>();
+                        List<Intersection> ints = new();
                         string[] pts = rte.InnerText.Trim().ToUpperInvariant().Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string pt in pts)
                         {
                             Intersection i;
                             if (pt.Length > 5 && !pt.Contains("VOR"))//lat long?
                             {
-                                Coordinate pos = new Coordinate(pt);
+                                Coordinate pos = new(pt);
                                 i = new Intersection(Conversions.ConvertToFlightplanLatLong(pos), pos);
                             }
                             else
@@ -252,7 +253,7 @@ namespace Maestro.Web
                         if (!tran.HasAttribute("Name"))
                             continue;
 
-                        List<Intersection> ints = new List<Intersection>();
+                        List<Intersection> ints = new();
                         string[] pts = tran.InnerText.Trim().ToUpperInvariant().Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string pt in pts)
                         {
@@ -261,7 +262,7 @@ namespace Maestro.Web
                             Intersection i;
                             if (ptUpdate.Length > 5)//lat long?
                             {
-                                Coordinate pos = new Coordinate(ptUpdate);
+                                Coordinate pos = new(ptUpdate);
                                 i = new Intersection(Conversions.ConvertToFlightplanLatLong(pos), pos);
                             }
                             else
@@ -275,8 +276,8 @@ namespace Maestro.Web
 
                         if (sidstar != null)
                             sidstar.Transitions.Add(tran.GetAttribute("Name").Trim().ToUpperInvariant(), ints);
-                        else if (approach != null)
-                            approach.Transitions.Add(tran.GetAttribute("Name").Trim().ToUpperInvariant(), ints);
+                        else
+                            approach?.Transitions.Add(tran.GetAttribute("Name").Trim().ToUpperInvariant(), ints);
                     }
 
                     if (ss.Name == "SID")
@@ -353,9 +354,11 @@ namespace Maestro.Web
                         if (!systemRunway.HasAttribute("Name") || !systemRunway.HasAttribute("DataRunway"))
                             continue;
 
-                        SystemRunway runway = new SystemRunway();
-                        runway.Name = systemRunway.GetAttribute("Name");
-                        runway.Airport = ap;
+                        SystemRunway runway = new()
+                        {
+                            Name = systemRunway.GetAttribute("Name"),
+                            Airport = ap
+                        };
                         runway.Runway = runway.Airport.Runways.Find(r => r.Name == systemRunway.GetAttribute("DataRunway"));
 
                         XmlNodeList sidsNodes = systemRunway.GetElementsByTagName("SID");
@@ -415,14 +418,12 @@ namespace Maestro.Web
                     }
                 }
             }
-
-            Loaded = true;
         }
 
         private static List<SIDSTAR> CreateSIDSTARsFromData(string[] data, SIDSTAR.Types type)
         {
             Airport airport = null;
-            List<SIDSTAR> sidstars = new List<SIDSTAR>();
+            List<SIDSTAR> sidstars = new();
 
             for (int i = 0; i < data.Length; i++)
             {
@@ -441,10 +442,12 @@ namespace Maestro.Web
 
                 if (splitLine.Length == 4 && splitLine[0] == "T")//T LINE
                 {
-                    SIDSTAR sidstar = new SIDSTAR();
-                    sidstar.Name = splitLine[1];
-                    sidstar.Type = type;
-                    sidstar.Airport = airport;
+                    SIDSTAR sidstar = new()
+                    {
+                        Name = splitLine[1],
+                        Type = type,
+                        Airport = airport
+                    };
                     string[] rwys = splitLine[3].Split(',');
                     foreach (string rwy in rwys)
                     {
@@ -488,18 +491,18 @@ namespace Maestro.Web
                     {
                         if (type == SIDSTAR.Types.SID)
                         {
-                            trans = name.Substring(periodIndex + 1);//new string(name.SkipWhile(c => c != '.').Skip(1).ToArray());
-                            name = name.Substring(0, periodIndex);//new string(name.TakeWhile(c => c != '.').ToArray());
+                            trans = name[(periodIndex + 1)..];//new string(name.SkipWhile(c => c != '.').Skip(1).ToArray());
+                            name = name[..periodIndex];//new string(name.TakeWhile(c => c != '.').ToArray());
                         }
                         else
                         {
-                            trans = name.Substring(0, periodIndex);//new string(name.TakeWhile(c => c != '.').ToArray());
-                            name = name.Substring(periodIndex + 1);//new string(name.SkipWhile(c => c != '.').Skip(1).ToArray());
+                            trans = name[..periodIndex];//new string(name.TakeWhile(c => c != '.').ToArray());
+                            name = name[(periodIndex + 1)..];//new string(name.SkipWhile(c => c != '.').Skip(1).ToArray());
                         }
                     }
                     SIDSTAR sidstar = sidstars.Find(ss => ss.Name == name && ss.Airport == airport);
 
-                    Intersection isec = new Intersection(splitLine[1], new Coordinate(double.Parse(lat), double.Parse(lon)));
+                    Intersection isec = new(splitLine[1], new Coordinate(double.Parse(lat), double.Parse(lon)));
 
                     if (trans != "")
                     {
@@ -538,7 +541,7 @@ namespace Maestro.Web
         {
             Airport airport = null;
 
-            List<Approach> apchs = new List<Approach>();
+            List<Approach> apchs = new();
 
             bool mapReached = false;
 
@@ -587,16 +590,18 @@ namespace Maestro.Web
 
                     Approach lastApch = null;
                     if (apchs.Count > 0)
-                        lastApch = apchs[apchs.Count - 1];
+                        lastApch = apchs[^1];
 
                     Approach apch = null;
 
                     if (lastApch == null || lastApch.Runway.Name != runway || lastApch.Name != name)
                     {
-                        apch = new Approach();
-                        apch.Name = name;
-                        apch.Airport = airport;
-                        apch.Runway = airport.Runways.Find(r => r.Name == runway);
+                        apch = new Approach
+                        {
+                            Name = name,
+                            Airport = airport,
+                            Runway = airport.Runways.Find(r => r.Name == runway)
+                        };
                         apchs.Add(apch);
                         mapReached = false;//reset
                     }
@@ -609,7 +614,7 @@ namespace Maestro.Web
                         continue;
                     }
 
-                    Intersection isec = new Intersection(isecName, new Coordinate(double.Parse(lat), double.Parse(lon)));
+                    Intersection isec = new(isecName, new Coordinate(double.Parse(lat), double.Parse(lon)));
 
                     if (trans != "----")
                     {
@@ -631,8 +636,7 @@ namespace Maestro.Web
         public static Airport GetAirport(string icaoname)
         {
             if (string.IsNullOrWhiteSpace(icaoname)) return null;
-            Airport apt;
-            if (Airports.TryGetValue(icaoname, out apt))
+            if (Airports.TryGetValue(icaoname, out Airport apt))
                 return apt;
             else
                 return null;
@@ -665,8 +669,7 @@ namespace Maestro.Web
 
         public static Intersection GetIntersection(string name, Coordinate latlongQualify = null, Intersection.NavaidTypes navaidType = Intersection.NavaidTypes.None)
         {
-            List<Intersection> ints;
-            if (Intersections.TryGetValue(name, out ints))
+            if (Intersections.TryGetValue(name, out List<Intersection> ints))
             {
                 if (navaidType != Intersection.NavaidTypes.None)
                     ints = ints.Where(i => i.NavaidType == navaidType).ToList();
@@ -681,8 +684,7 @@ namespace Maestro.Web
 
         public static Airway GetAirway(string name)
         {
-            Airway awy;
-            if (Airways.TryGetValue(name, out awy))
+            if (Airways.TryGetValue(name, out Airway awy))
                 return awy;
             else
                 return null;
@@ -692,7 +694,7 @@ namespace Maestro.Web
         public class Airway
         {
             public string Name;
-            public List<Intersection> Intersections = new List<Intersection>();
+            public List<Intersection> Intersections = new();
         }
         [Serializable()]
         public class Intersection
@@ -717,7 +719,7 @@ namespace Maestro.Web
             public Types Type = Types.Unknown;
             public NavaidTypes NavaidType = NavaidTypes.None;
 
-            public Coordinate LatLong = new Coordinate();
+            public Coordinate LatLong = new();
 
             public Intersection()
             {
@@ -733,13 +735,13 @@ namespace Maestro.Web
             public string ICAOName = "";
             public string FullName = "";
             public int Elevation = -1;
-            public Coordinate LatLong = new Coordinate();
-            public List<Runway> Runways = new List<Runway>();
+            public Coordinate LatLong = new();
+            public List<Runway> Runways = new();
 
             public class Runway
             {
                 public string Name = "";
-                public Coordinate LatLong = new Coordinate();
+                public Coordinate LatLong = new();
                 public Runway()
                 { }
                 public Runway(string name, Coordinate latLong)
@@ -760,11 +762,11 @@ namespace Maestro.Web
             public string Name;
             public Airport Airport;
 
-            public Dictionary<string, List<Intersection>> Transitions = new Dictionary<string, List<Intersection>>();
-            public List<Intersection> Route = new List<Intersection>();
+            public Dictionary<string, List<Intersection>> Transitions = new();
+            public List<Intersection> Route = new();
             public Types Type;
-            public List<Airport.Runway> Runways = new List<Airport.Runway>();
-            public Dictionary<string, List<Intersection>> RunwaySpecificRoute = new Dictionary<string, List<Intersection>>();
+            public List<Airport.Runway> Runways = new();
+            public Dictionary<string, List<Intersection>> RunwaySpecificRoute = new();
         }
 
         public class Approach
@@ -772,8 +774,8 @@ namespace Maestro.Web
             public string Name;
             public Airport Airport;
 
-            public Dictionary<string, List<Intersection>> Transitions = new Dictionary<string, List<Intersection>>();
-            public List<Intersection> Route = new List<Intersection>();
+            public Dictionary<string, List<Intersection>> Transitions = new();
+            public List<Intersection> Route = new();
             public Airport.Runway Runway;
         }
 
@@ -788,10 +790,10 @@ namespace Maestro.Web
             public string Name;
             public Airport Airport;
             public Airport.Runway Runway;
-            public List<SIDSTARKey> SIDs = new List<SIDSTARKey>();
-            public Dictionary<SIDSTARKey, Approach> STARApproaches = new Dictionary<SIDSTARKey, Approach>();
+            public List<SIDSTARKey> SIDs = new();
+            public Dictionary<SIDSTARKey, Approach> STARApproaches = new();
 
-            public struct SIDSTARKey
+            public readonly struct SIDSTARKey
             {
                 public readonly SIDSTAR sidStar;
                 public readonly AircraftType typeRestriction;
