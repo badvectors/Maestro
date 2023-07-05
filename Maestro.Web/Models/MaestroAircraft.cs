@@ -1,7 +1,6 @@
 ﻿using Maestro.Web.Models;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using vatSysServer.Models;
 
@@ -27,6 +26,7 @@ namespace Maestro.Common
             Route = aircraft.Route;
             RoutePoints = aircraft.RoutePoints;
             UpdateUTC = aircraft.UpdateUTC;
+            RFL = aircraft.RFL;
 
             FindFeederFix();
             CalculateDistance();
@@ -34,7 +34,7 @@ namespace Maestro.Common
         }
 
         public string FeederFix { get; set; }
-        public bool FeederPassed => RoutePoints.FirstOrDefault(x => x.Name == FeederFix).Passed;
+        public bool FeederPassed => RoutePoints.FirstOrDefault(x => x.Name == FeederFix)?.Passed ?? false;
         public double? DistanceToFeeder { get; set; }
         public double? HoursToFeeder { get; set; }
         public double? DistanceFromFeeder { get; set; }
@@ -67,6 +67,7 @@ namespace Maestro.Common
             Altitude = aircraft.Altitude;
             RoutePoints = aircraft.RoutePoints;
             UpdateUTC = aircraft.UpdateUTC;
+            RFL = aircraft.RFL;
 
             FindFeederFix();
         }
@@ -206,6 +207,12 @@ namespace Maestro.Common
                 DistanceFromFeeder = Math.Round(distance, 2);
 
                 double hoursFromFeeder = 0;
+
+                // Distance on climb
+
+                // Distance in cruise
+
+                // Distance on descent
 
                 var pdLevel1 = performance.GetNearestDataToLevel(20000); // 30nm+ 
 

@@ -18,7 +18,8 @@ namespace Maestro.Plugin
                 Route = fdr.Route,
                 Airport = fdr.DesAirport,
                 Runway = fdr.ArrivalRunway?.Runway?.Name ?? null,
-                STAR = fdr.STAR?.Name ?? null
+                STAR = fdr.STAR?.Name ?? null,
+                RFL = fdr.RFL
             };
 
             if (isSweatBox) aircraft.SweatBox = true;
@@ -37,6 +38,7 @@ namespace Maestro.Plugin
             aircraft.Airport = fdr.DesAirport;
             aircraft.Runway = fdr.ArrivalRunway?.Runway?.Name ?? null;
             aircraft.STAR = fdr.STAR?.Name ?? null;
+            aircraft.RFL = fdr.RFL;
 
             if (fdr.ParsedRoute != null) aircraft = RouteUpdate(aircraft, fdr.ParsedRoute);
 

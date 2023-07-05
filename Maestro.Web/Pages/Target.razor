@@ -1,0 +1,15 @@
+﻿@page "/target/{callsign}"
+@using Maestro.Common;
+@using Maestro.Web.Models;
+@using Newtonsoft.Json;
+
+<pre>
+    @JsonConvert.SerializeObject(Aircraft(), Formatting.Indented)
+</pre>
+
+@code {
+    [Parameter]
+    public string callsign { get; set; }
+
+    private Aircraft Aircraft() => Functions.AircraftData.FirstOrDefault(x => x.Callsign == callsign);
+}

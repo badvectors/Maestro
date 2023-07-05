@@ -43,7 +43,7 @@ namespace Maestro.Plugin
 
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            Remove();
+            // Remove();
         }
 
         public async void OnFDRUpdate(FDP2.FDR updated)
