@@ -40,59 +40,6 @@ namespace Maestro.Web.Models
             catch { }
         }
 
-        public static void Slots(bool sweatbox)
-        {
-            if (UpdatingSlots) return;
-
-            UpdatingSlots = true;
-
-            var airports = AircraftData.Where(x => x.SweatBox == sweatbox).GroupBy(x => x.Airport);
-
-            foreach (var airport in airports)
-            {
-                var slots = airport.Where(x => x.SlotLocked && x.Slot.HasValue).Select(x => x.Slot.Value).ToList();
-
-                foreach (var aircraft in airport.OrderBy(x => x.ETA))
-                {
-                    if (!aircraft.ETA.HasValue || aircraft.SlotLocked)
-                    {
-                        continue;
-                    }
-
-                    var closestMinute = aircraft.ETA.Value;
-
-                    while (true)
-                    {
-                        var conflict = slots.Any(x => x == closestMinute ||
-                            x > closestMinute.AddMinutes(-2) && x < closestMinute ||
-                            x < closestMinute.AddMinutes(2) && x > closestMinute);
-
-                        if (conflict)
-                            closestMinute = closestMinute.AddMinutes(1);
-                        else
-                            break;
-                    }
-
-                    aircraft.Slot = closestMinute;
-
-                    slots.Add(closestMinute);
-
-                    if (aircraft.DistanceToFeeder < 30) aircraft.SlotLocked = true;
-
-                    AircraftUpdated?.Invoke(null, new EventArgs());
-                }
-            }
-
-            UpdatingSlots = false;
-        }
-
-        public static void UnlockSlot(MaestroAircraft aircraft)
-        {
-            if (!aircraft.SlotLocked) return;
-            aircraft.SlotLocked = false;
-            AircraftUpdated?.Invoke(null, new EventArgs());
-        }
-
         public static void Remove(MaestroAircraft aircraft)
         {
             AircraftData.Remove(aircraft);
@@ -102,6 +49,8 @@ namespace Maestro.Web.Models
 
         public static async Task LoadData()
         {
+            vatSysServer.DEM.Load();
+
             var url = "https://raw.githubusercontent.com/vatSys/australia-dataset/master/Airspace.xml";
 
             try

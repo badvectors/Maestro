@@ -18,51 +18,43 @@
     <div class="row">
         @foreach (var runway in airport.Runways.OrderBy(x => x.Name))
         {
-            var aircrafts = Functions.AircraftData.Where(x => x.SweatBox == SweatBox && x.ETA.HasValue && x.Airport == airport.ICAOName && x.Runway == runway.Name).OrderBy(x => x.Slot);
+            var aircrafts = Functions.AircraftData.Where(x => x.SweatBox == SweatBox && x.Airport == airport.ICAOName && x.Runway == runway.Name);
 
             if (aircrafts.Count() == 0) continue;
 
             <div class="col-sm">
 
-                <h5 class="mt-3">Runway @runway.Name</h5>
+                <h5 class="mt-3 mb-3">Runway @runway.Name</h5>
 
                 <table class="table table-bordered">
                     <tr>
-                        <th style="width: 120px;">Callsign</th>
-                        <th>Slot</th>
-                        <th></th>
+                        <th>Callsign</th>
+                        <th>Altitude</th>
+                        <th>RFL</th>
+                        <th>GS</th>
+                        <th>STAR</th>
+                        <th>Feeder</th>
+                        <th>DTG</th>
+                        <th>HTG</th>
+                        <th>GTG</th>
+                        <th>Mode</th>
                     </tr>
 
-                    @foreach (var aircraft in aircrafts)
+                    @foreach (var aircraft in aircrafts.OrderBy(x => x.DistanceToGo))
                     {
                         <tr>
-                            <td style="height:35px;">
-                                @aircraft.Callsign
+                            <td>
+                                <a href="/Target/@aircraft.Callsign" target="_blank">@aircraft.Callsign</a>
                             </td>
-                            <td class="@SlotColour(aircraft)">
-                                @if (aircraft.Slot != null)
-                                {
-                                   @aircraft.Slot.Value.ToString("HHmm")
-                                }
-                                @if (aircraft.Delta != null && aircraft.Delta != TimeSpan.Zero)
-                                {
-                                    if (aircraft.Delta < TimeSpan.Zero)
-                                    {
-                                        <i class="fa-solid fa-caret-up"></i>
-                                    }
-                                    if (aircraft.Delta > TimeSpan.Zero)
-                                    {
-                                        <i class="fa-solid fa-caret-down"></i>
-                                    }
-                                    @aircraft.DeltaDisplay()
-                                }
-                            </td>
-                            <td style="width:15px;">
-                                @if (aircraft.SlotLocked)
-                                {
-                                    <i @onclick="() => Functions.UnlockSlot(aircraft)" class="fa-solid fa-unlock"></i>
-                                }
-                            </td>
+                            <td>@aircraft.Altitude</td>
+                            <td>@aircraft.RFL</td>
+                            <td>@aircraft.GroundSpeed</td>
+                            <td>@aircraft.STAR</td>
+                            <td>@aircraft.FeederFix</td>
+                            <td>@aircraft.DistanceToGo</td>
+                            <td>@aircraft.HeightToGo</td>
+                            <td>@aircraft.GlidePathToGo</td>
+                            <td>@aircraft.Mode()</td>
                         </tr>
                     }
 
@@ -114,12 +106,6 @@ else
     private void Update(object sender, EventArgs e)
     {
         InvokeAsync(StateHasChanged);
-    }
-
-    private string SlotColour(MaestroAircraft aircraft)
-    {
-        if (aircraft.SlotLocked) return "text-primary";
-        return "text-dark";
     }
 
     public void Enter(KeyboardEventArgs e)
